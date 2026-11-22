@@ -33,7 +33,7 @@ const STEPS = [
     code: "04",
     title: "Build & Save Blueprints",
     description:
-      "View the interactive 3D crafted visual reference, follow illustrated step-by-step checklists, switch currencies, refine concepts, and save builds to My Workshop.",
+      "View the realistic crafted output reference, follow illustrated step-by-step checklists, switch currencies, refine concepts, and save builds to My Workshop.",
     icon: BookmarkCheck,
   },
 ];

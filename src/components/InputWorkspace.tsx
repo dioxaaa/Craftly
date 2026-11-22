@@ -540,7 +540,7 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
       {/* Primary Action */}
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-[#4A3528]/70">
-          Generates 3 distinct concepts—Practical, Unexpected, and Experimental—with 3D assembly references.
+          Generates 3 distinct concepts—Practical, Unexpected, and Experimental—with realistic output references.
         </p>
 
         <button

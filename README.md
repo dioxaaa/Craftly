@@ -20,8 +20,8 @@ The application works immediately upon first load with zero required accounts, o
   - **"What else?"** generates fresh, deduplicated concepts for the same object without repeating earlier titles.
   - **Single-Card Refinements** adapt an individual concept to be *More Practical*, *More Creative*, or *Cheaper*.
 - **Interactive Blueprint Studio**:
-  - **Crafted 3D Output Reference**: Custom HTML5 Canvas 3D perspective turntable renderer (`Crafted3DViewer`) with drag-to-orbit, zoom/reset controls, interactive numbered callouts, and an optional **Studio Photo View** toggle.
-  - **Illustrated Step-by-Step Guide**: Action-coded SVG diagrams (`measure`, `cut`, `puncture`, `fold`, `thread`, `join`, `mount`, `finish`, `test`), maker tips, and persistent step completion checkboxes.
+  - **Crafted Output Reference**: Photorealistic studio product photography via `/api/inventions/render-photo` with an immediate high-detail HTML5 Canvas oak-workbench render fallback and interactive numbered part callouts.
+  - **Realistic Step-by-Step Guide**: Object- and action-specific realistic workshop visuals alongside optional sequenced step photographs, maker tips, and persistent step completion checkboxes.
 - **Multi-Currency Cost Estimates**: Live conversion across `PHP`, `USD`, `EUR`, `GBP`, and `JPY`, persisted in `localStorage` (`craftly-currency`).
 - **My Workshop**: Versioned `localStorage` persistence (`craftly-creations-v1`) supporting search, invention category filtering (`All Categories`, `Practical`, `Unexpected`, `Experimental`), favorites filtering, and build progress tracking.
 - **Responsive Design**: Adapts cleanly across mobile (`320px+`), tablet, and desktop viewports.
@@ -114,8 +114,8 @@ If `GEMINI_API_KEY` is missing, a request times out (`14000ms`), or an upstream 
     ├── index.css                    # Tailwind CSS v4 setup and design tokens
     ├── main.tsx
     ├── components/
-    │   ├── BlueprintView.tsx        # Detailed blueprint view with 3D viewer, materials, and steps
-    │   ├── Crafted3DViewer.tsx      # Interactive HTML5 Canvas 3D turntable and Studio Photo toggle
+    │   ├── BlueprintView.tsx        # Detailed blueprint view with output reference, materials, and steps
+    │   ├── Crafted3DViewer.tsx      # Realistic Crafted Output Reference viewer and studio photo loader
     │   ├── CraftlyLogo.tsx          # Custom handcrafted SVG wordmark
     │   ├── CurrencySelector.tsx     # PHP / USD / EUR / GBP / JPY switcher
     │   ├── Header.tsx               # Navigation header and How It Works trigger

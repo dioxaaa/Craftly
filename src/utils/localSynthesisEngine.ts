@@ -1762,7 +1762,7 @@ export function synthesizeLocalInventions(
       testingValidation: recipe.testingValidation,
       possibleImprovements: recipe.possibleImprovements,
       assemblyParts: recipe.assemblyParts,
-      studioPrompt: `Studio product photograph of ${finalName}, handmade upcycled craft built from ${analysis.objectName}, warm wooden workbench, soft daylight, architectural craft aesthetic`,
+      studioPrompt: `Finished handmade ${finalName} crafted from ${analysis.objectName}, featuring ${recipe.materialsReused.slice(0, 2).join(" and ")} joined with ${recipe.additionalMaterials.slice(0, 2).join(" and ")}. Shown in realistic everyday use (${recipe.purpose.toLowerCase()}) on a natural oak studio workbench`,
       sourceSummary: analysis.objectName,
       generatedBy: "local",
     };

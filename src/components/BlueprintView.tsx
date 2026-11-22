@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
   Bookmark,
@@ -13,6 +13,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { formatEstimatedCost } from "../config/currency";
+import { requestStepPhotoRender } from "../services/inventionService";
 import type {
   CurrencyCode,
   InventionConcept,
@@ -95,6 +96,64 @@ export const BlueprintView: React.FC<BlueprintViewProps> = ({
   onRefine,
   onToast,
 }) => {
+  const [studioCloudActive, setStudioCloudActive] = useState(false);
+  const [stepPhotos, setStepPhotos] = useState<Record<string, string>>({});
+  const [activeStepPhotoId, setActiveStepPhotoId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setStudioCloudActive(false);
+    setStepPhotos({});
+    setActiveStepPhotoId(null);
+  }, [invention.id]);
+
+  const handleStudioPhotoAvailable = useCallback(() => {
+    setStudioCloudActive(true);
+  }, []);
+
+  useEffect(() => {
+    if (!studioCloudActive) return;
+    let cancelled = false;
+    const materials = [
+      ...invention.materialsReused.slice(0, 2),
+      ...invention.additionalMaterials.slice(0, 2),
+    ];
+
+    (async () => {
+      for (const step of invention.steps) {
+        if (cancelled) break;
+        setActiveStepPhotoId(step.id);
+        const url = await requestStepPhotoRender(
+          step.title,
+          step.instruction,
+          invention.name,
+          analysis.objectName,
+          materials,
+          `step:${invention.id}:${step.id}`
+        );
+        if (cancelled) break;
+        if (!url) {
+          break;
+        }
+        setStepPhotos((prev) => ({ ...prev, [step.id]: url }));
+      }
+      if (!cancelled) {
+        setActiveStepPhotoId(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    analysis.objectName,
+    invention.additionalMaterials,
+    invention.id,
+    invention.materialsReused,
+    invention.name,
+    invention.steps,
+    studioCloudActive,
+  ]);
+
   const totalSteps = invention.steps.length;
   const completedCount = invention.steps.filter((s) =>
     completedStepIds.includes(s.id)
@@ -286,12 +345,11 @@ export const BlueprintView: React.FC<BlueprintViewProps> = ({
         </div>
       </div>
 
-      {/* Interactive 3D Crafted Output Reference */}
+      {/* Realistic Crafted Output Reference */}
       <Crafted3DViewer
-        title={invention.name}
-        parts={invention.assemblyParts}
-        studioPrompt={invention.studioPrompt}
-        onToast={onToast}
+        invention={invention}
+        analysis={analysis}
+        onStudioPhotoAvailable={handleStudioPhotoAvailable}
       />
 
       {/* Functional Overview & Original Object Contribution */}
@@ -397,7 +455,7 @@ export const BlueprintView: React.FC<BlueprintViewProps> = ({
         </div>
 
         <ol className="space-y-4">
-          {invention.steps.map((step) => {
+          {invention.steps.map((step, stepIndex) => {
             const done = completedStepIds.includes(step.id);
             return (
               <li
@@ -409,8 +467,13 @@ export const BlueprintView: React.FC<BlueprintViewProps> = ({
                 }`}
               >
                 <StepIllustration
-                  actionType={step.actionType}
-                  caption={step.diagramCaption}
+                  step={step}
+                  stepIndex={stepIndex}
+                  totalSteps={totalSteps}
+                  invention={invention}
+                  analysis={analysis}
+                  photoUrl={stepPhotos[step.id]}
+                  isRenderingPhoto={activeStepPhotoId === step.id}
                 />
 
                 <div className="min-w-0 flex-1">

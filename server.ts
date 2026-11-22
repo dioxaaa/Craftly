@@ -266,7 +266,8 @@ async function startServer() {
         "Each concept must have 4-5 clear steps with valid actionType (measure, cut, puncture, fold, thread, join, mount, finish, test) " +
         "and 3-4 assemblyParts with valid shape (cylinder, box, cone, ring, rod, panel, dome) and material " +
         "(pet_plastic, cardboard, brushed_metal, wood_grain, terracotta, woven_fabric, ceramic, rubber). " +
-        "Keep coordinates in [-0.8, 0.8] and scales in [0.12, 1.5] so the 3D workshop turntable assembly stays balanced.";
+        "Keep coordinates in [-0.8, 0.8] and scales in [0.12, 1.5] so the 3D workshop turntable assembly stays balanced. " +
+        "Write studioPrompt as a vivid, concrete product photography prompt describing the finished physical object in realistic detail, visible salvaged parts, authentic handmade joinery, and real-world contents (e.g., herbs in soil, pens in slots, warm bulb glow).";
 
       const textPrompt = [
         `Object description: ${input?.textDescription || "Everyday object"}`,
@@ -407,20 +408,56 @@ async function startServer() {
     }
 
     try {
-      const { studioPrompt } = req.body as { studioPrompt?: string };
+      const {
+        studioPrompt,
+        aspectRatio,
+        referenceType,
+        objectName,
+        inventionName,
+        materials,
+      } = req.body as {
+        studioPrompt?: string;
+        aspectRatio?: "1:1" | "4:3" | "16:9" | "3:4" | "9:16";
+        referenceType?: "output" | "step";
+        objectName?: string;
+        inventionName?: string;
+        materials?: string[];
+      };
+
       if (!studioPrompt) {
         res.json({ fallback: true });
         return;
       }
 
+      const validRatios = new Set(["1:1", "3:4", "4:3", "9:16", "16:9"]);
+      const safeAspectRatio =
+        aspectRatio && validRatios.has(aspectRatio) ? aspectRatio : "4:3";
+
+      const materialContext =
+        Array.isArray(materials) && materials.length > 0
+          ? ` Visible physical materials: ${materials.slice(0, 4).join(", ")}.`
+          : "";
+
+      const fullPrompt =
+        referenceType === "step"
+          ? `Photorealistic overhead three-quarter workshop instructional photograph showing a craftsperson's hands and real household tools performing this build step: ${studioPrompt}.${
+              objectName ? ` Salvaged base object: ${objectName}.` : ""
+            }${materialContext} Placed on a warm natural oak workbench in crisp morning studio daylight, authentic physical textures, clear recognizable parts, shallow depth of field, 50mm lens photography, zero text, zero numbers, zero arrows, zero watermarks.`
+          : `Photorealistic editorial product photograph of the finished handmade upcycled invention${
+              inventionName ? ` "${inventionName}"` : ""
+            }: ${studioPrompt}.${
+              objectName ? ` Clearly built from salvaged ${objectName}.` : ""
+            }${materialContext} Placed in real-world use on a sunlit natural oak studio workbench, soft directional window daylight, authentic handmade joinery and crisp physical textures, 50mm product photography, zero text, zero labels, zero watermarks.`;
+
       const response = await ai.models.generateContent({
         model: IMAGE_GEN_MODEL,
         contents: {
-          parts: [
-            {
-              text: `${studioPrompt}, warm studio daylight, handcrafted workshop aesthetic, crisp physical textures, no text overlays`,
-            },
-          ],
+          parts: [{ text: fullPrompt }],
+        },
+        config: {
+          imageConfig: {
+            aspectRatio: safeAspectRatio,
+          },
         },
       });
 

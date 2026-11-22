@@ -113,16 +113,65 @@ export async function refineSingleInvention(
   return refineLocalInvention(invention, analysis, mode);
 }
 
+const photoRenderCache = new Map<string, string>();
+
+export interface StudioPhotoRenderOptions {
+  cacheKey?: string;
+  aspectRatio?: "1:1" | "4:3" | "16:9";
+  referenceType?: "output" | "step";
+  objectName?: string;
+  inventionName?: string;
+  materials?: string[];
+}
+
 export async function requestStudioPhotoRender(
-  studioPrompt: string
+  studioPrompt: string,
+  options?: StudioPhotoRenderOptions
 ): Promise<string | null> {
+  const key = options?.cacheKey ?? `${options?.referenceType ?? "output"}:${studioPrompt}`;
+  const cached = photoRenderCache.get(key);
+  if (cached) {
+    return cached;
+  }
+
   const apiResponse = await postJsonWithTimeout<{
     fallback?: boolean;
     imageUrl?: string;
-  }>("/api/inventions/render-photo", { studioPrompt }, 18000);
+  }>(
+    "/api/inventions/render-photo",
+    {
+      studioPrompt,
+      aspectRatio: options?.aspectRatio ?? "4:3",
+      referenceType: options?.referenceType ?? "output",
+      objectName: options?.objectName,
+      inventionName: options?.inventionName,
+      materials: options?.materials,
+    },
+    18000
+  );
 
   if (apiResponse && !apiResponse.fallback && apiResponse.imageUrl) {
+    photoRenderCache.set(key, apiResponse.imageUrl);
     return apiResponse.imageUrl;
   }
   return null;
+}
+
+export async function requestStepPhotoRender(
+  stepTitle: string,
+  stepInstruction: string,
+  inventionName: string,
+  objectName: string,
+  materials: string[],
+  cacheKey: string
+): Promise<string | null> {
+  const prompt = `${stepTitle}: ${stepInstruction} (for upcycled invention "${inventionName}")`;
+  return requestStudioPhotoRender(prompt, {
+    cacheKey,
+    aspectRatio: "4:3",
+    referenceType: "step",
+    objectName,
+    inventionName,
+    materials,
+  });
 }
