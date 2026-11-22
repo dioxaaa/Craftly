@@ -1,4 +1,4 @@
-# Craftly
+# Craftly.
 
 **See what else it could be.**
 
