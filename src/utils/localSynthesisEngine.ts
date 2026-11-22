@@ -165,26 +165,111 @@ const OBJECT_PROFILES: ObjectProfile[] = [
     secondaryFinish: "wood_grain",
   },
   {
+    key: "slipper_rubber",
+    keywords: [
+      "slipper",
+      "flip-flop",
+      "flip flop",
+      "flipflop",
+      "sandal",
+      "tsinelas",
+      "eva",
+      "foam sole",
+      "rubber sole",
+      "footwear",
+      "crocs",
+      "shoe sole",
+    ],
+    objectName: "Damaged Rubber Slipper",
+    category: "Closed-Cell EVA Foam & Rubber Footwear",
+    originalFunction: "Cushioned everyday sole with toe-post strap",
+    defaultCondition: ["snapped toe strap", "intact ribbed EVA rubber sole"],
+    physicalProperties: [
+      "high-friction grooved tread",
+      "shock-absorbing closed-cell foam",
+      "waterproof & buoyant",
+      "easy to carve or bevel cleanly with a craft knife",
+    ],
+    shapeProfile: "Contoured thick flat sole (1.5–2 cm thick) with snapped strap plugs",
+    components: ["ribbed rubber footbed", "patterned outsole", "detached Y-strap", "toe-post anchor"],
+    materials: ["closed-cell EVA foam / vulcanized rubber", "molded PVC strap"],
+    reusableParts: [
+      "thick grooved rubber sole slab",
+      "firm heel wedge section",
+      "flexible PVC strap strips",
+    ],
+    potentialFunctions: [
+      "hand-carved relief printing stamp",
+      "non-slip doorstop wedge & vibration pads",
+      "compression-slit cable & broom grip rack",
+      "cushioned desk wrist rest or sanding block",
+    ],
+    limitations: [
+      "EVA foam melts near open flames or hot irons",
+      "standard white school glue does not bond rubber—use contact cement or mechanical wood screws/twine",
+    ],
+    primaryFinish: "rubber",
+    secondaryFinish: "wood_grain",
+  },
+  {
     key: "tin_can",
-    keywords: ["tin can", "can", "cans", "coffee tin", "cookie tin", "metal can", "jar", "mason jar", "glass jar"],
-    objectName: "Metal Tin / Glass Jar",
-    category: "Rigid Food Container",
+    keywords: ["tin can", "tin", "coffee tin", "cookie tin", "metal can", "can"],
+    objectName: "Empty Metal Tin Can",
+    category: "Rigid Steel Container",
     originalFunction: "Airtight pantry preservation",
     defaultCondition: ["empty", "clean rigid walls"],
     physicalProperties: [
-      "rigid vertical wall",
-      "non-flammable",
-      "magnetic (if steel tin)",
-      "watertight base",
+      "rigid vertical steel wall",
+      "non-flammable & heat-resistant",
+      "magnetic steel body",
+      "watertight base seam",
     ],
-    shapeProfile: "Open-top rigid cylinder",
+    shapeProfile: "Open-top rigid ribbed cylinder",
     components: ["rolled rim", "ribbed cylinder wall", "stamped base"],
-    materials: ["tin-plated steel or soda-lime glass"],
-    reusableParts: ["cylindrical shell", "rolled rim collar", "removable lid"],
-    potentialFunctions: ["magnetic wall spice/tool pod", "perforated lantern sconce", "gravity-fed twine dispenser", "modular desktop riser"],
-    limitations: ["cut tin edges must be crimped or taped", "glass requires gentle handling when drilling"],
+    materials: ["tin-plated steel"],
+    reusableParts: ["cylindrical steel shell", "rolled rim collar", "stamped base"],
+    potentialFunctions: [
+      "magnetic wall spice/tool pod",
+      "punched-pattern lantern sconce",
+      "gravity-fed twine dispenser",
+      "cylindrical utensil caddy",
+    ],
+    limitations: [
+      "freshly cut metal edges must be crimped flat or taped",
+      "uncoated steel rusts if left standing in water",
+    ],
     primaryFinish: "brushed_metal",
     secondaryFinish: "terracotta",
+  },
+  {
+    key: "glass_jar",
+    keywords: ["jar", "mason jar", "glass jar", "jam jar", "pickle jar", "glass bottle"],
+    objectName: "Empty Glass Jar",
+    category: "Reusable Glassware",
+    originalFunction: "Sealed pantry preserve jar",
+    defaultCondition: ["empty", "clean glass chamber with screw lid"],
+    physicalProperties: [
+      "crystal clear optical walls",
+      "100% waterproof & non-porous",
+      "heat tolerant",
+      "threaded metal screw lid",
+    ],
+    shapeProfile: "Clear cylinder with threaded rim and metal lid",
+    components: ["clear glass body", "threaded glass neck", "twist-off metal lid"],
+    materials: ["soda-lime glass", "lacquered steel twist lid"],
+    reusableParts: ["clear optical vessel", "anchored metal screw lid", "wide mouth collar"],
+    potentialFunctions: [
+      "under-shelf twist-lock hardware storage",
+      "closed moss & fern micro-terrarium",
+      "water-magnified botanical LED globe",
+      "gravity-fed dry craft jar",
+    ],
+    limitations: [
+      "never attempt standard steel-bit drilling on glass",
+      "handle gently on hard stone surfaces",
+    ],
+    primaryFinish: "pet_plastic",
+    secondaryFinish: "brushed_metal",
   },
   {
     key: "wood_crate",
@@ -202,8 +287,16 @@ const OBJECT_PROFILES: ObjectProfile[] = [
     components: ["slat rails", "corner blocks", "base runners"],
     materials: ["pine or hardwood slats", "steel brads"],
     reusableParts: ["planed parallel slats", "corner bracing blocks", "natural frame tray"],
-    potentialFunctions: ["cantilevered desk shelf", "vertical herb ladder", "modular pegboard caddy", "angled laptop & book lectern"],
-    limitations: ["splinters require 120-grit sanding", "unsealed timber warps in standing water"],
+    potentialFunctions: [
+      "cantilevered desk shelf",
+      "vertical herb ladder",
+      "modular pegboard caddy",
+      "angled laptop & book lectern",
+    ],
+    limitations: [
+      "splinters require 120-grit sanding",
+      "unsealed timber warps in standing water",
+    ],
     primaryFinish: "wood_grain",
     secondaryFinish: "brushed_metal",
   },
@@ -288,6 +381,18 @@ function extractConditionSignals(rawText: string, defaults: string[]): string[] 
   return detected.length > 0 ? detected : defaults;
 }
 
+function cleanPhotoFileName(photoFileName?: string): string {
+  if (!photoFileName) return "";
+  const withoutExt = photoFileName.replace(/\.[^.]+$/, "");
+  const withoutHashes = withoutExt
+    .replace(/[-_][0-9a-f]{6,}$/i, "")
+    .replace(/^(img|dsc|pxl|mvimg|screenshot|photo|image)[-_]?\d{4,}[-_]?/i, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\d{6,}\b/g, "")
+    .trim();
+  return withoutHashes;
+}
+
 function cleanObjectPhrase(rawText: string, photoFileName?: string): string {
   const trimmed = rawText.trim();
   if (trimmed.length > 0) {
@@ -300,14 +405,9 @@ function cleanObjectPhrase(rawText: string, photoFileName?: string): string {
     }
   }
 
-  if (photoFileName) {
-    const base = photoFileName
-      .replace(/\.[^.]+$/, "")
-      .replace(/[-_]+/g, " ")
-      .trim();
-    if (base.length >= 3) {
-      return titleCase(base);
-    }
+  const cleanedPhoto = cleanPhotoFileName(photoFileName);
+  if (cleanedPhoto.length >= 3) {
+    return titleCase(cleanedPhoto);
   }
 
   return "Everyday Salvaged Object";
@@ -383,38 +483,49 @@ function inferMaterialFinish(text: string): {
   };
 }
 
+function getActiveModeText(input: SynthesisInput): string {
+  if (input.mode === "photo") {
+    return (input.photoNotes ?? "").trim();
+  }
+  if (input.mode === "sketch") {
+    return (input.sketchNotes ?? "").trim();
+  }
+  return input.textDescription.trim();
+}
+
 export function analyzeObjectInput(input: SynthesisInput): ObjectAnalysis {
-  const combinedSource = [
-    input.textDescription,
-    input.photoFileName ? input.photoFileName.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ") : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const activeText = getActiveModeText(input);
+  const cleanedFilename = input.mode === "photo" ? cleanPhotoFileName(input.photoFileName) : "";
+  const combinedSource = [activeText, cleanedFilename].filter(Boolean).join(" ");
 
   const lower = normalizeText(combinedSource);
   const matchedProfile = OBJECT_PROFILES.find((profile) =>
     profile.keywords.some((kw) => lower.includes(kw))
   );
 
-  const goalSummary = input.goal.trim() || input.constraints.desiredFunction.trim() || "Everyday functional second life";
+  const goalSummary =
+    input.goal.trim() ||
+    input.constraints.desiredFunction.trim() ||
+    "Everyday functional second life";
 
   let analysisNote: string | undefined;
-  if (input.mode === "photo" && input.photoFileName) {
+  if (input.mode === "photo" && !activeText) {
+    analysisNote = cleanedFilename
+      ? `Inferred from uploaded image (${cleanedFilename}). Add brief photo notes if you want even more tailored measurements.`
+      : "Inferred in offline mode without visual pixel inspection—add brief notes about the object and material for exact tailoring.";
+  } else if (input.mode === "sketch" && !activeText) {
     analysisNote =
-      "Local studio synthesis uses your written description and image file metadata (" +
-      input.photoFileName +
-      ") rather than cloud vision pixel inspection.";
-  } else if (input.mode === "sketch") {
-    analysisNote =
-      "Local studio synthesis combines your sketch geometry notes and object description to propose buildable structures.";
+      "Inferred from your sketch in offline mode—add a short note naming the material (e.g. wood, rubber, metal) for exact material steps.";
   }
 
   if (matchedProfile) {
     return {
       objectName:
-        input.textDescription.trim().length > 0
-          ? cleanObjectPhrase(input.textDescription, input.photoFileName)
-          : matchedProfile.objectName,
+        activeText.length > 0
+          ? cleanObjectPhrase(activeText, cleanedFilename)
+          : cleanedFilename.length >= 3
+            ? titleCase(cleanedFilename)
+            : matchedProfile.objectName,
       category: matchedProfile.category,
       originalFunction: matchedProfile.originalFunction,
       condition: extractConditionSignals(combinedSource, matchedProfile.defaultCondition),
@@ -431,13 +542,25 @@ export function analyzeObjectInput(input: SynthesisInput): ObjectAnalysis {
   }
 
   const inferred = inferMaterialFinish(combinedSource);
-  const objectName = cleanObjectPhrase(input.textDescription, input.photoFileName);
+  const fallbackLabel =
+    activeText.length >= 3
+      ? cleanObjectPhrase(activeText, cleanedFilename)
+      : cleanedFilename.length >= 3
+        ? titleCase(cleanedFilename)
+        : input.mode === "photo"
+          ? "Photographed Salvaged Object"
+          : input.mode === "sketch"
+            ? "Sketched Salvaged Object"
+            : "Everyday Salvaged Object";
 
   return {
-    objectName,
+    objectName: fallbackLabel,
     category: "Salvaged Everyday Object",
-    originalFunction: `Original household utility of ${objectName.toLowerCase()}`,
-    condition: extractConditionSignals(combinedSource, ["unused or partially worn", "reusable core structure"]),
+    originalFunction: `Original household utility of ${fallbackLabel.toLowerCase()}`,
+    condition: extractConditionSignals(combinedSource, [
+      "unused or partially worn",
+      "reusable core structure",
+    ]),
     physicalProperties: inferred.properties,
     shapeProfile: "Composite functional geometry with separable housing and mounts",
     components: ["outer body", "structural frame", "contact base", "fastening edges"],
@@ -1260,7 +1383,1563 @@ function buildCuratedRecipes(
     };
   }
 
-  // Dynamic contextual builder for all other object profiles (cardboard, electric_fan, mug, clothes, tin_can, wood_crate, or arbitrary unknown items)
+  if (profileKey === "slipper_rubber") {
+    return {
+      PRACTICAL: {
+        name: "Ribbed EVA Doorstop Wedge & Appliance Anti-Vibration Kit",
+        category: "Home Hardware & Ergonomics",
+        oneLineDescription:
+          "Carves the thick closed-cell rubber sole into a high-grip ribbed doorstop wedge plus 4 shock-absorbing chair or appliance foot pads.",
+        purpose: forDesk
+          ? "Stops desk chairs, speakers, or table fans from rattling and scratching smooth floors."
+          : "Holds heavy interior doors open silently while cushioning washing machines, stools, or furniture legs.",
+        originalObjectContribution:
+          "Reuses the tapered heel height, grooved non-slip footbed tread, and detached strap loop as a ready-to-pull wedge handle.",
+        materialsReused: [
+          "Thick EVA rubber heel & midfoot sole",
+          "Broken strap stub (pull-tab loop)",
+        ],
+        additionalMaterials: [
+          "Contact cement or double-sided carpet tape (optional)",
+          "Fine chalk or pen for cut lines",
+        ],
+        requiredTools: ["Sharp utility knife or box cutter", "Metal ruler", "120-grit sandpaper"],
+        functionalityExplanation:
+          "Slicing the heel section at a gradual 12-degree taper turns the compressible ribbed outsole tread into a self-wedging doorstop that grips tile and wood without scuffing; the remaining forefoot yields four circular damping pads.",
+        dimensions: "14 cm L × 6.5 cm W × 2.2 cm H",
+        sustainabilityValue:
+          "Keeps non-biodegradable EVA footwear foam out of landfills by turning it into durable hardware cushions.",
+        safetyConsiderations: [
+          "Always slice rubber against a thick cardboard cutting mat using controlled shallow passes—never force a dull blade.",
+          "Keep fingers behind the metal straightedge.",
+        ],
+        testingValidation: [
+          "Slide wedge beneath a swinging door and push gently to confirm non-slip floor grip.",
+          "Place four cut pads beneath a vibrating desk fan or stool to test rattle reduction.",
+        ],
+        possibleImprovements: [
+          "Loop paracord through the original toe-post hole so the doorstop hangs on the doorknob when unused.",
+          "Stack two heel halves with contact cement for extra-tall door gaps.",
+        ],
+        steps: [
+          {
+            title: "Wash sole & pull out loose strap stubs",
+            instruction:
+              "Scrub grit off the outsole grooves with soapy water, dry completely, and pull out the snapped toe-post plug.",
+            actionType: "finish",
+            tip: "Clean rubber slices much more smoothly and preserves blade sharpness.",
+            diagramCaption: "Clean grooved rubber sole and remove snapped straps",
+          },
+          {
+            title: "Measure 12-degree wedge & 4 foot pads",
+            instruction:
+              "Mark a 13 cm tapered wedge block across the thick heel zone and trace four 4 cm circles on the flat forefoot.",
+            actionType: "measure",
+            tip: "Keep the ribbed footbed facing up so the wedge grips both floor and door bottom.",
+            diagramCaption: "Mark beveled doorstop wedge and circular pads",
+          },
+          {
+            title: "Slice beveled wedge & pads in shallow passes",
+            instruction:
+              "Using a metal ruler guide, draw a sharp utility knife in 3–4 light passes to bevel the wedge ramp cleanly and cut out the pads.",
+            actionType: "cut",
+            tip: "Dab a drop of soapy water on the knife blade to cut EVA foam effortlessly.",
+            diagramCaption: "Slice clean 12-degree ramp and damping pads",
+          },
+          {
+            title: "Thread pull-loop cord through strap hole",
+            instruction:
+              "Thread a short 12 cm twine loop or reused strap strip through the rear strap socket and knot it inside the underside recess.",
+            actionType: "thread",
+            tip: "Makes pulling the wedged doorstop out effortless without bending low.",
+            diagramCaption: "Fit pull-tab loop into rear sole hole",
+          },
+          {
+            title: "Test floor grip under door & furniture",
+            instruction:
+              "Wedge the ribbed slope under an open door and seat the 4 pads under chair or speaker feet to verify zero slip.",
+            actionType: "test",
+            tip: "Sand bottom slightly with coarse grit if floors are glossy marble.",
+            diagramCaption: "Verify non-slip doorstop wedge and pad grip",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Beveled EVA Doorstop Wedge",
+            shape: "cone",
+            material: "rubber",
+            position: [-0.25, -0.25, 0],
+            scale: [1.15, 0.55, 0.72],
+            colorHex: "#2E6A85",
+            calloutIndex: 1,
+            description: "Ribbed rubber wedge sliced from thick heel section",
+          },
+          {
+            id: "p2",
+            label: "Strap Pull-Tab Loop",
+            shape: "ring",
+            material: "rubber",
+            position: [-0.75, -0.15, 0],
+            scale: [0.24, 0.24, 0.14],
+            colorHex: "#1F2933",
+            calloutIndex: 2,
+            description: "Reused heel anchor for easy doorknob hanging",
+          },
+          {
+            id: "p3",
+            label: "4× Anti-Vibration Foot Pads",
+            shape: "cylinder",
+            material: "rubber",
+            position: [0.55, -0.32, 0.1],
+            scale: [0.52, 0.25, 0.52],
+            colorHex: "#3A82A3",
+            calloutIndex: 3,
+            description: "Circular forefoot cushions for chairs & desk gear",
+          },
+        ],
+      },
+      UNEXPECTED: {
+        name: "Hand-Carved EVA Relief Print Stamp & Ink Block",
+        category: "Printmaking & Textile Craft",
+        oneLineDescription:
+          "Transforms the soft-carving EVA slipper sole into a linocut-style botanical relief stamp mounted on a wood grip block.",
+        purpose: forSell
+          ? "Prints custom handmade wrapping paper, kraft tags, and cotton tote bags you can craft and sell."
+          : "Lets you hand-stamp personalized greeting cards, fabric patches, notebook covers, and gift wrap cleanly.",
+        originalObjectContribution:
+          "Closed-cell EVA foam carves as smoothly as expensive art-store Speedball linoleum while remaining springy enough to print crisp solids on uneven paper or cloth.",
+        materialsReused: [
+          "Flat sanded EVA slipper sole slab",
+          "Heel plug strip (small texture accent stamp)",
+        ],
+        additionalMaterials: [
+          "Scrap pine block or stacked cardboard handle (8 × 8 cm)",
+          "Contact cement or strong double-sided mounting tape",
+          "Water-based acrylic paint or stamp ink pad",
+        ],
+        requiredTools: ["Sharp craft scalpel or utility knife", "Sandpaper (180-grit)", "Pencil"],
+        functionalityExplanation:
+          "Sanding off surface dirt reveals fresh closed-cell foam. Carving away negative space around a drawn leaf or geometric motif leaves crisp raised islands that transfer ink evenly onto paper or cotton canvas.",
+        dimensions: "9 cm L × 7 cm W × 3.8 cm H",
+        sustainabilityValue:
+          "Replaces virgin rubber carving blocks with discarded footwear foam that holds fine ink detail for hundreds of prints.",
+        safetyConsiderations: [
+          "Always carve away from your holding hand; rest the slab flat on a non-slip mat.",
+          "Remember lettering must be drawn mirrored in reverse before carving.",
+        ],
+        testingValidation: [
+          "Dab light paint onto the raised motif and press firmly onto scrap kraft paper to spot any high unwanted ridges.",
+          "Trim stray background nibs until test prints come out crisp.",
+        ],
+        possibleImprovements: [
+          "Carve a matching border stamp from the leftover heel curve.",
+          "Seal wood grip block with beeswax for comfortable studio ink sessions.",
+        ],
+        steps: [
+          {
+            title: "Sand footbed smooth & trace block footprint",
+            instruction:
+              "Sand a 9 × 7 cm flat zone on the slipper footbed with 180-grit paper until smooth and trace a bold botanical leaf or geometric pattern in pencil.",
+            actionType: "measure",
+            tip: "Bold shapes with 3 mm line thickness print cleanest on textured paper and tote bags.",
+            diagramCaption: "Sand sole flat and sketch relief motif",
+          },
+          {
+            title: "Carve 3 mm negative relief channels",
+            instruction:
+              "Trace your motif outline at a slight outward angle with a craft knife, then pare away the surrounding background foam 3 mm deep.",
+            actionType: "cut",
+            tip: "Angling cuts slightly outward gives raised stamp lines sturdy wide bases.",
+            diagramCaption: "Carve negative space around raised print motif",
+          },
+          {
+            title: "Cut matching hardwood or kraft handle block",
+            instruction:
+              "Cut a scrap wood block (or laminate 4 layers of corrugated cardboard) slightly larger than your carved rubber pad.",
+            actionType: "join",
+            tip: "Glue a small wood knob or cork on the back for easy lifting.",
+            diagramCaption: "Bond carved rubber pad onto wood grip block",
+          },
+          {
+            title: "Smooth edge chamfers & seal handle",
+            instruction:
+              "Trim excess foam cleanly around the block edges and wipe dust off the carved printing face with a damp cloth.",
+            actionType: "finish",
+            tip: "Check there are no tall ink-catching islands around the outer rim.",
+            diagramCaption: "Trim edges flush and dust carved relief face",
+          },
+          {
+            title: "Ink & test-print on kraft card or fabric",
+            instruction:
+              "Tap an ink pad or thin foam-brushed acrylic paint across the carved face and press straight down onto kraft paper.",
+            actionType: "test",
+            tip: "Less paint gives sharper botanical edges than heavy puddles.",
+            diagramCaption: "Pull crisp test print on kraft stationery",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Carved EVA Relief Plate",
+            shape: "box",
+            material: "rubber",
+            position: [0, -0.32, 0],
+            scale: [1.1, 0.24, 0.85],
+            colorHex: "#2E6A85",
+            calloutIndex: 1,
+            description: "Hand-carved botanical motif cut into rubber sole",
+          },
+          {
+            id: "p2",
+            label: "Oak Mounting Block",
+            shape: "box",
+            material: "wood_grain",
+            position: [0, 0.05, 0],
+            scale: [1.14, 0.38, 0.88],
+            colorHex: "#C5976A",
+            calloutIndex: 2,
+            description: "Rigid backing distributing even hand pressure",
+          },
+          {
+            id: "p3",
+            label: "Turned Grip Handle",
+            shape: "cylinder",
+            material: "wood_grain",
+            position: [0, 0.48, 0],
+            scale: [0.4, 0.45, 0.4],
+            colorHex: "#A4764B",
+            calloutIndex: 3,
+            description: "Ergonomic lift knob for clean straight impressions",
+          },
+        ],
+      },
+      EXPERIMENTAL: {
+        name: "Compression-Slit Broom, Brush & Cable Wall Grip Rack",
+        category: "Kinetic Friction Hardware",
+        oneLineDescription:
+          "Slices springy star-slit jaws into the contoured rubber sole mounted on a wall cleat to clamp brooms, mops, paintbrushes, or thick cables by pure elasticity.",
+        purpose:
+          "Keeps long-handled brooms, craft rulers, and charging cords snapped vertically against a wall without buying spring-loaded plastic clips.",
+        originalObjectContribution:
+          "Uses the 1.8 cm thick elastic memory of EVA/rubber soles—slotted flaps flex open when a handle pushes in and bite tightly downward under gravity.",
+        materialsReused: [
+          "Full-length contoured EVA rubber sole",
+          "Reused strap pieces as side bumpers",
+        ],
+        additionalMaterials: [
+          "26 cm scrap wood backing batten (or triple-layered cardboard)",
+          "4 flat-head wood screws & washers (or heavy Command strips)",
+        ],
+        requiredTools: ["Sharp utility knife", "Awl or drill", "Screwdriver & ruler"],
+        functionalityExplanation:
+          "Cutting three star-shaped cross slits spaced along the sole creates flexible rubber petals inside a recessed channel. When a broom handle or thick cord pushes into a slit, the compressed foam petals grip it via static friction.",
+        dimensions: "26 cm W × 9.5 cm H × 4.2 cm D",
+        sustainabilityValue:
+          "Replaces brittle plastic broom-holder clips that snap after months, using resilient footwear elastomer.",
+        safetyConsiderations: [
+          "Use wide fender washers under screw heads so screws never pull through soft EVA foam.",
+          "Drill pilot holes slightly smaller than handle diameter before slicing radial star slits.",
+        ],
+        testingValidation: [
+          "Press a wooden broomstick and thick USB-C cable into separate slots and tug downward gently to verify grip hold.",
+          "Check wall cleat security after 24 hours.",
+        ],
+        possibleImprovements: [
+          "Add smaller 8 mm star slits on one end specifically for artist brushes and screwdrivers.",
+          "Paint the wood batten in warm sage to frame the teal-blue rubber insert.",
+        ],
+        steps: [
+          {
+            title: "Cut wood cleat & mark 3 grip centers",
+            instruction:
+              "Cut a 26 × 9.5 cm scrap wood batten and mark three evenly spaced grip stations 7 cm apart along the slipper sole centerline.",
+            actionType: "measure",
+            tip: "Leave 3 cm solid rubber around outer edges so the sole stays rigid.",
+            diagramCaption: "Mark three evenly spaced grip centers on sole",
+          },
+          {
+            title: "Cut circular openings & 6-petal star slits",
+            instruction:
+              "Punch or cut a 12 mm starter hole at each mark, then slice six 15 mm radial star cuts outward from each hole edge.",
+            actionType: "cut",
+            tip: "Keep radial cuts symmetrical so clamping pressure stays centered.",
+            diagramCaption: "Slice radial star-slits for elastic clamping",
+          },
+          {
+            title: "Space sole off wall cleat with strap shims",
+            instruction:
+              "Place cut strips of the discarded PVC strap behind the top and bottom edges of the sole so the center star slits have room behind them to flex inward.",
+            actionType: "join",
+            tip: "That 6 mm rear air gap is what lets handles push cleanly through the jaws.",
+            diagramCaption: "Add 6 mm rear shim spacers for petal flex",
+          },
+          {
+            title: "Bolt sole onto wood cleat with washers",
+            instruction:
+              "Drive four screws with wide washers between the star slots through the rubber sole and strap shims into the wood cleat.",
+            actionType: "mount",
+            tip: "Snug screws until rubber just begins to dimple—do not crush flat.",
+            diagramCaption: "Fasten slotted rubber grip bar onto wood batten",
+          },
+          {
+            title: "Snap brooms, brushes & cords into jaws",
+            instruction:
+              "Mount cleat securely and test pushing broom handles, rulers, and thick power cables straight into the star jaws.",
+            actionType: "test",
+            tip: "Lift slightly upward and pull forward for effortless one-hand release.",
+            diagramCaption: "Test compression grip with handles and cords",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Wood Wall Mounting Cleat",
+            shape: "box",
+            material: "wood_grain",
+            position: [0, 0, -0.25],
+            scale: [1.55, 0.65, 0.18],
+            colorHex: "#C5976A",
+            calloutIndex: 1,
+            description: "Rigid backing rail anchoring rack cleanly to wall",
+          },
+          {
+            id: "p2",
+            label: "Slotted EVA Grip Insert",
+            shape: "panel",
+            material: "rubber",
+            position: [0, 0, 0.05],
+            scale: [1.35, 0.52, 0.22],
+            colorHex: "#2E6A85",
+            calloutIndex: 2,
+            description: "Elastic rubber sole with 3 radial star-slit jaws",
+          },
+          {
+            id: "p3",
+            label: "PVC Strap Flex Shims",
+            shape: "rod",
+            material: "rubber",
+            position: [0, 0.22, -0.08],
+            scale: [1.25, 0.1, 0.12],
+            colorHex: "#1F2933",
+            calloutIndex: 3,
+            description: "Creates rear clearance for rubber petals to flex",
+          },
+        ],
+      },
+    };
+  }
+
+  if (profileKey === "mug") {
+    return {
+      PRACTICAL: {
+        name: "Stoneware Knife-Honing Station & Heavy Tool Caddy",
+        category: "Workshop & Kitchen Utility",
+        oneLineDescription:
+          "Turns the cracked mug's unglazed ceramic foot-ring into a real blade-honing stone while organizing brushes and workshop shears inside.",
+        purpose:
+          "Keeps paring knives, craft blades, and studio brushes sharp and upright in one tip-proof stoneware station.",
+        originalObjectContribution:
+          "Kiln-fired unglazed ceramic foot-rings have ~1000-grit micro-abrasive texture—the exact traditional secret chefs use to hone dull knives.",
+        materialsReused: [
+          "Cracked ceramic mug body",
+          "Unglazed bottom stoneware foot-ring",
+        ],
+        additionalMaterials: [
+          "Cork coaster or non-slip rubber base ring",
+          "Dry rice or coarse sand ballast (optional bottom layer)",
+        ],
+        requiredTools: ["Sandpaper (220-grit)", "Warm soapy sponge", "Permanent paint marker or cord"],
+        functionalityExplanation:
+          "Stabilizing the weighted mug on a cork ring protects desks while providing an upright tool well; flipping the mug momentarily exposes its raw ceramic bottom rim for safe 20-degree knife edge honing.",
+        dimensions: "9.5 cm Diameter × 10.5 cm H",
+        sustainabilityValue:
+          "Gives cracked mugs that are unsafe for boiling drinks a permanent mechanical workshop purpose.",
+        safetyConsiderations: [
+          "Never use a cracked mug for hot liquids or food storage.",
+          "Wrap any chipped handle stub cleanly with hemp twine or sand sharp glaze edges smooth under water.",
+        ],
+        testingValidation: [
+          "Draw a dull kitchen paring knife at a 20-degree angle across the bottom unglazed ceramic ring 6 times per side and test paper slicing.",
+          "Fill cup with scissors and rulers to confirm tip-proof balance.",
+        ],
+        possibleImprovements: [
+          "Wrap jute twine tightly around the mug waist to cover any hairline crack cleanly.",
+          "Divide top opening with two crossed rubber bands for brush spacing.",
+        ],
+        steps: [
+          {
+            title: "Wet-sand chipped glaze edges smooth",
+            instruction:
+              "Under running water, gently round any sharp ceramic chips or broken handle nubs using 220-grit wet/dry sandpaper.",
+            actionType: "finish",
+            tip: "Wet-sanding prevents fine ceramic dust from becoming airborne.",
+            diagramCaption: "Wet-sand chipped glaze edges completely smooth",
+          },
+          {
+            title: "Wrap protective twine collar around crack",
+            instruction:
+              "Coil tight jute twine around the midsection of the mug with a dab of wood glue to reinforce the hairline crack against widening.",
+            actionType: "thread",
+            tip: "Adds warm tactile grip when flipping the mug over to hone blades.",
+            diagramCaption: "Reinforce vessel wall with coiled jute wrap",
+          },
+          {
+            title: "Cut non-slip cork bench pad",
+            instruction:
+              "Trace the mug base onto a thin cork or scrap rubber sheet and cut a 9 cm coaster ring.",
+            actionType: "cut",
+            tip: "Keeps the mug quiet on desk surfaces and collects honing dust.",
+            diagramCaption: "Trim non-slip cork base coaster",
+          },
+          {
+            title: "Test bottom stoneware ring knife-honing",
+            instruction:
+              "Flip the dry mug upside down on a damp cloth and sweep a kitchen knife blade gently at 20 degrees along the raw unglazed ring.",
+            actionType: "test",
+            tip: "Wipe dark metal streaks off the ceramic ring afterward with a kitchen eraser.",
+            diagramCaption: "Hone dull blade along unglazed foot-ring",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Non-Slip Cork Base",
+            shape: "cylinder",
+            material: "wood_grain",
+            position: [0, -0.58, 0],
+            scale: [1.05, 0.14, 1.05],
+            colorHex: "#B6885E",
+            calloutIndex: 1,
+            description: "Cushions stoneware foot and grips desktop cleanly",
+          },
+          {
+            id: "p2",
+            label: "Twine-Reinforced Ceramic Vessel",
+            shape: "cylinder",
+            material: "ceramic",
+            position: [0, 0.05, 0],
+            scale: [0.92, 1.08, 0.92],
+            colorHex: "#EDE5D8",
+            calloutIndex: 2,
+            description: "Heavy stoneware body + raw bottom honing ring",
+          },
+        ],
+      },
+      UNEXPECTED: {
+        name: "Kintsugi-Inspired Succulent & Charcoal Air-Garden Dish",
+        category: "Botanical & Ceramics",
+        oneLineDescription:
+          "Highlights the hairline crack with a golden ochre seal line and turns the heavy stoneware mug into a healthy pebble-drained succulent planter.",
+        purpose:
+          "Transforms a broken keepsake mug into a calm windowsill succulent planter with proper root drainage.",
+        originalObjectContribution:
+          "Heavy glazed stoneware insulates roots from midday heat swings while the crack line becomes an intentional aesthetic feature.",
+        materialsReused: ["Cracked ceramic mug"],
+        additionalMaterials: [
+          "1 tbsp activated charcoal + small aquarium pebbles",
+          "Cactus/succulent potting mix",
+          "Golden ochre craft paint or waterproof epoxy dab",
+        ],
+        requiredTools: ["Small brush", "Spoon", "Dry cloth"],
+        functionalityExplanation:
+          "Layering 2.5 cm of pebbles and crushed charcoal below gritty succulent soil creates an internal perched drainage sump so roots never sit wet even without a drilled bottom hole.",
+        dimensions: "9.5 cm Diameter × 14 cm H",
+        sustainabilityValue:
+          "Preserves sentimental ceramic keepsakes rather than tossing them when a crack appears.",
+        safetyConsiderations: [
+          "Do not attempt to drill a stoneware mug with regular wood/metal bits—it will shatter; use the charcoal-pebble drainage layer instead.",
+        ],
+        testingValidation: [
+          "Mist or spoon-water only 2 tablespoons into the soil and verify zero weeping through the sealed exterior crack.",
+        ],
+        possibleImprovements: [
+          "Nest a small wooden tag bearing the plant's species and watering schedule.",
+        ],
+        steps: [
+          {
+            title: "Seal interior crack & trace ochre accent vein",
+            instruction:
+              "Brush waterproof craft sealer along the inside crack, let dry, and trace the outer fracture delicately with golden ochre paint.",
+            actionType: "finish",
+            tip: "Celebrates the mug's history in true kintsugi spirit.",
+            diagramCaption: "Seal inside crack and highlight outer vein",
+          },
+          {
+            title: "Layer 2.5 cm pebble & charcoal sump",
+            instruction:
+              "Spoon 2 cm of clean gravel topped with 0.5 cm crushed horticultural charcoal into the bottom of the mug.",
+            actionType: "mount",
+            tip: "Charcoal keeps stagnant moisture fresh and odor-free.",
+            diagramCaption: "Build gravel and charcoal drainage layer",
+          },
+          {
+            title: "Pack gritty soil & plant succulent",
+            instruction:
+              "Fill with porous cactus mix, nest a haworthia or jade rosette, and top-dress with pale river stones.",
+            actionType: "join",
+            tip: "Wait 3 days after potting before the first light watering.",
+            diagramCaption: "Seat succulent and mineral top-dressing",
+          },
+          {
+            title: "Verify crack dryness after light watering",
+            instruction:
+              "Add 2 tablespoons of water near the roots and inspect the exterior wall after 30 minutes.",
+            actionType: "test",
+            tip: "Succulents thrive best on a bright windowsill.",
+            diagramCaption: "Confirm dry crack seal and healthy balance",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Kintsugi-Sealed Ceramic Cup",
+            shape: "cylinder",
+            material: "ceramic",
+            position: [0, -0.1, 0],
+            scale: [0.95, 1.0, 0.95],
+            colorHex: "#F0E8DA",
+            calloutIndex: 1,
+            description: "Glazed stoneware body with golden repair accent",
+          },
+          {
+            id: "p2",
+            label: "Succulent Crown",
+            shape: "dome",
+            material: "woven_fabric",
+            position: [0, 0.55, 0],
+            scale: [0.85, 0.5, 0.85],
+            colorHex: "#7C8B6A",
+            calloutIndex: 2,
+            description: "Low-water jade or haworthia nestled above gravel",
+          },
+        ],
+      },
+      EXPERIMENTAL: {
+        name: "Passive Ceramic Parabolic Desk Speaker Amplifier",
+        category: "Passive Acoustics",
+        oneLineDescription:
+          "Couples a notched cardboard or bamboo phone cradle into the glazed stoneware mug bell to amplify desk audio naturally with zero power.",
+        purpose:
+          "Boosts vocal clarity and mid-range volume for study podcasts, video calls, or ambient music.",
+        originalObjectContribution:
+          "Smooth vitrified porcelain/stoneware walls reflect sound waves far more crisply than soft cardboard tubes.",
+        materialsReused: ["Thick-walled ceramic mug"],
+        additionalMaterials: [
+          "Small cardboard or scrap wood collar sleeve",
+          "Felt or folded paper wedge",
+        ],
+        requiredTools: ["Scissors or craft knife", "Ruler & pencil"],
+        functionalityExplanation:
+          "Sliding your phone's bottom speaker port into a snug felt-lined collar aimed into the curved mug interior turns the rigid ceramic cup into an acoustic horn resonator.",
+        dimensions: "12 cm W × 14 cm H × 10 cm D",
+        sustainabilityValue:
+          "Eliminates battery-powered mini desk speakers using pure geometric acoustics.",
+        safetyConsiderations: [
+          "Line cardboard phone slot edges with soft felt or paper tape so glass phone backs never scratch against ceramic.",
+        ],
+        testingValidation: [
+          "Play voice audio inside and outside the cradle and measure clear directional projection forward across the desk.",
+        ],
+        possibleImprovements: [
+          "Angle the mug slightly upward on a folded cardboard chock toward your ears.",
+        ],
+        steps: [
+          {
+            title: "Measure phone width & bottom speaker port",
+            instruction:
+              "Measure the width and thickness of your phone plus where the speaker grille sits along its bottom edge.",
+            actionType: "measure",
+            tip: "Leave a small notch for the charging cable if you dock while plugged in.",
+            diagramCaption: "Measure phone slot and speaker port opening",
+          },
+          {
+            title: "Cut felt-lined cardboard acoustic bridge",
+            instruction:
+              "Cut a stiff rectangular cardboard bridge with a snug rectangular cutout that channels the phone speaker cleanly into the open mug mouth.",
+            actionType: "cut",
+            tip: "Keep the bridge flush against the mug rim so sound cannot leak sideways.",
+            diagramCaption: "Cut snug acoustic channel bridge",
+          },
+          {
+            title: "Seat mug upright or angled on foam wedge",
+            instruction:
+              "Tilt the mug 20 degrees upward on a folded kraft wedge and slip the phone cradle onto the upper rim.",
+            actionType: "mount",
+            tip: "Aiming the ceramic mouth toward your face boosts clarity noticeably.",
+            diagramCaption: "Angle mug resonator and lock bridge",
+          },
+          {
+            title: "Audio projection & stability test",
+            instruction:
+              "Dock phone, play spoken audio at 50% volume, and verify clear horn amplification without rattling.",
+            actionType: "test",
+            tip: "Tuck a tissue inside the mug bottom if resonance sounds overly bright.",
+            diagramCaption: "Test passive ceramic horn projection",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Ceramic Horn Chamber",
+            shape: "cylinder",
+            material: "ceramic",
+            position: [-0.15, -0.15, 0],
+            scale: [0.95, 1.05, 0.95],
+            colorHex: "#EDE5D8",
+            calloutIndex: 1,
+            description: "Glazed stoneware bell reflecting mid-range sound",
+          },
+          {
+            id: "p2",
+            label: "Notched Phone Dock Bridge",
+            shape: "box",
+            material: "cardboard",
+            position: [0.35, 0.25, 0],
+            scale: [0.65, 0.65, 0.28],
+            colorHex: "#D98A6C",
+            calloutIndex: 2,
+            description: "Directs speaker port cleanly into ceramic cavity",
+          },
+        ],
+      },
+    };
+  }
+
+  if (profileKey === "electric_fan") {
+    return {
+      PRACTICAL: {
+        name: "Rotating Steel-Grille Tool & Drying Carousel",
+        category: "Workshop & Craft Studio",
+        oneLineDescription:
+          "Strips the broken motor coil and converts the circular powder-coated fan cage and weighted tilt stand into an upright hanging tool and herb-drying carousel.",
+        purpose:
+          "Holds craft brushes, pliers, tape rolls, or air-drying culinary herbs on a tip-proof rotating desk stand.",
+        originalObjectContribution:
+          "Uses the heavy weighted base, tilt neck, and concentric wire spacing that naturally hooks S-hooks and tool clips.",
+        materialsReused: [
+          "Weighted anti-tip fan pedestal",
+          "Articulating tilt neck",
+          "Powder-coated steel wire fan cage",
+        ],
+        additionalMaterials: [
+          "6–8 bent paperclip or wire S-hooks",
+          "Small cardboard or tin center tray",
+        ],
+        requiredTools: ["Screwdriver", "Pliers", "Wire cutters (for dead cord removal)"],
+        functionalityExplanation:
+          "Removing the heavy dead copper motor lightens the head while keeping the cast weighted base and wire cage intact. S-hooks snap anywhere onto the radial ribs.",
+        dimensions: "36 cm Diameter × 48 cm H",
+        sustainabilityValue:
+          "Keeps bulky metal appliance frames out of scrap piles without complex electronics repair.",
+        safetyConsiderations: [
+          "Always unplug and completely remove the dead electrical cord and motor coil before repurposing.",
+          "Tape or cap any cut wire ends inside the neck joint.",
+        ],
+        testingValidation: [
+          "Hang 1 kg of hand tools or herb bundles evenly around the perimeter and test tilt neck lock.",
+        ],
+        possibleImprovements: [
+          "Bolt a shallow tin lid into the center grille hub as a screw & paperclip dish.",
+        ],
+        steps: [
+          {
+            title: "Unscrew cage & safely remove dead motor/cord",
+            instruction:
+              "Unclip the front grille ring, unscrew the blade nut, and remove the non-working motor block and electrical cord completely.",
+            actionType: "cut",
+            tip: "Keep the steel mounting plate and pivot neck bolt intact.",
+            diagramCaption: "Strip dead motor and cord, keep wire cage",
+          },
+          {
+            title: "Re-attach empty wire cage to tilt pedestal",
+            instruction:
+              "Lock the rear and front wire grilles back together using the perimeter clips and mount cleanly onto the weighted neck.",
+            actionType: "mount",
+            tip: "Leave the center emblem hub on for a finished look.",
+            diagramCaption: "Mount clean radial wire cage onto weighted stand",
+          },
+          {
+            title: "Bend S-hooks & clip center tray",
+            instruction:
+              "Form six sturdy S-hooks from heavy wire or jumbo paperclips and clip them across concentric grille rings.",
+            actionType: "join",
+            tip: "Space hooks evenly across left and right quadrants.",
+            diagramCaption: "Attach S-hooks along concentric steel rings",
+          },
+          {
+            title: "Load tools or herb bundles & test tilt",
+            instruction:
+              "Hang scissors, brushes, tape, or herbs and angle the tilt neck 20 degrees upward for easy reach.",
+            actionType: "test",
+            tip: "Check base balance before adding heavier pliers.",
+            diagramCaption: "Balance-test loaded carousel stand",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Weighted Ballast Pedestal",
+            shape: "cylinder",
+            material: "rubber",
+            position: [0, -0.72, 0],
+            scale: [1.1, 0.25, 1.1],
+            colorHex: "#383532",
+            calloutIndex: 1,
+            description: "Heavy anti-tip base stabilizing upright rack",
+          },
+          {
+            id: "p2",
+            label: "Radial Steel Wire Cage",
+            shape: "ring",
+            material: "brushed_metal",
+            position: [0, 0.22, 0],
+            scale: [1.28, 1.28, 0.45],
+            colorHex: "#8D9399",
+            calloutIndex: 2,
+            description: "Concentric steel wire rungs for S-hooks & clips",
+          },
+        ],
+      },
+      UNEXPECTED: {
+        name: "Domed Wire-Cage Moss Basket & Trailing Vine Trellis",
+        category: "Vertical Urban Gardening",
+        oneLineDescription:
+          "Lines the hemispherical steel fan grille with burlap or coconut coir to create a sculptural tabletop moss basket and climbing plant trellis.",
+        purpose:
+          "Elevates trailing pothos, strawberries, or ferns toward window light with 360-degree root aeration.",
+        originalObjectContribution:
+          "Powder-coated fan baskets naturally form an ideal rust-resistant geodesic trellis dome.",
+        materialsReused: ["Hemispherical wire fan grille", "Weighted tilt base"],
+        additionalMaterials: [
+          "Burlap sack, old cotton shirt, or coco-coir liner",
+          "Potting soil & trailing plant cutting",
+        ],
+        requiredTools: ["Scissors", "Screwdriver", "Twine"],
+        functionalityExplanation:
+          "Lining the lower half of the wire bowl with breathable burlap holds moist soil while the upper wire dome supports climbing tendrils cleanly.",
+        dimensions: "35 cm Diameter × 46 cm H",
+        sustainabilityValue:
+          "Replaces wire hanging baskets sold at garden centers using broken home appliances.",
+        safetyConsiderations: [
+          "Disconnect and discard all internal wiring and motor parts before adding soil or watering.",
+        ],
+        testingValidation: [
+          "Water lightly over a sink first to verify burlap holds soil particles securely.",
+        ],
+        possibleImprovements: [
+          "Place a wide ceramic plate under the base to catch drips.",
+        ],
+        steps: [
+          {
+            title: "Detach electrical motor & clean wire basket",
+            instruction:
+              "Remove the dead motor, cord, and plastic impeller so only the clean steel wire cage and pedestal remain.",
+            actionType: "cut",
+            tip: "Wash grilles in warm soapy water for clean metal finish.",
+            diagramCaption: "Isolate clean wire hemisphere and stand",
+          },
+          {
+            title: "Line lower hemisphere with breathable fabric",
+            instruction:
+              "Press a square of burlap or doubled scrap cotton fabric inside the lower dome bowl and lash edges to the perimeter wire with twine.",
+            actionType: "thread",
+            tip: "Double-layer fabric prevents fine soil from washing out.",
+            diagramCaption: "Tie breathable burlap liner inside lower bowl",
+          },
+          {
+            title: "Fill soil & weave vine stems across ribs",
+            instruction:
+              "Add light potting mix, plant a trailing vine, and snap the top wire cage dome gently over the crown as a climbing trellis.",
+            actionType: "mount",
+            tip: "Guide young tendrils through outer grille rings.",
+            diagramCaption: "Plant vine and mount upper wire trellis dome",
+          },
+          {
+            title: "Tilt toward window light & check drip catch",
+            instruction:
+              "Angle the articulating neck toward morning sun and place a shallow saucer beneath the base.",
+            actionType: "test",
+            tip: "Rotate 90 degrees weekly for even growth.",
+            diagramCaption: "Test tilt balance and root drainage",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Tilt Stand Base",
+            shape: "cylinder",
+            material: "rubber",
+            position: [0, -0.72, 0],
+            scale: [1.05, 0.24, 1.05],
+            colorHex: "#383532",
+            calloutIndex: 1,
+            description: "Weighted base supporting elevated trellis",
+          },
+          {
+            id: "p2",
+            label: "Burlap-Lined Wire Bowl",
+            shape: "dome",
+            material: "brushed_metal",
+            position: [0, 0.18, 0],
+            scale: [1.22, 1.1, 0.72],
+            colorHex: "#8D9399",
+            calloutIndex: 2,
+            description: "Aerated hemispherical plant cradle & trellis",
+          },
+        ],
+      },
+      EXPERIMENTAL: {
+        name: "Pleated Parchment Pendant & Articulated Studio Lamp",
+        category: "Upcycled Lighting",
+        oneLineDescription:
+          "Wraps folded origami parchment strips across the radial steel fan cage over a cool LED bulb for an architectural sculptural desk lamp.",
+        purpose:
+          "Casts warm diffused directional light across drawing desks or reading corners with adjustable tilt.",
+        originalObjectContribution:
+          "Uses the fan's articulating tilt neck and radial concentric cage as an instant mid-century wireframe shade skeleton.",
+        materialsReused: ["Wire fan grille dome", "Weighted articulating stand"],
+        additionalMaterials: [
+          "Baking parchment or heavy tracing paper strips",
+          "Battery LED puck or cool clip-on LED bulb",
+          "Double-sided craft tape",
+        ],
+        requiredTools: ["Scissors", "Ruler", "Screwdriver"],
+        functionalityExplanation:
+          "Weaving accordion-folded paper louvers between the wire cage spokes diffuses harsh LED glare into soft layered shadow bands.",
+        dimensions: "35 cm Diameter × 46 cm H",
+        sustainabilityValue:
+          "Creates a bespoke architectural lamp from zero-value appliance scrap.",
+        safetyConsiderations: [
+          "Use cool low-wattage LED bulbs or battery LED pucks ONLY—never incandescent bulbs near paper.",
+        ],
+        testingValidation: [
+          "Run LED light inside closed paper-wrapped dome for 30 minutes and confirm all surfaces remain cool to touch.",
+        ],
+        possibleImprovements: [
+          "Leave bottom quadrant unshaded for focused reading light on the desk.",
+        ],
+        steps: [
+          {
+            title: "Remove dead motor & clean radial cage",
+            instruction:
+              "Dismantle broken motor parts and wipe the steel cage ribs clean.",
+            actionType: "cut",
+            tip: "Keep the rear protective hub plate to clip an LED puck.",
+            diagramCaption: "Strip old motor and prep clean wire frame",
+          },
+          {
+            title: "Cut & accordion-fold parchment louvers",
+            instruction:
+              "Cut 6 cm wide strips of baking parchment and fold sharp 1.5 cm zig-zag pleats.",
+            actionType: "fold",
+            tip: "Bone-folding creases sharp makes crisp light shadows.",
+            diagramCaption: "Accordion-fold warm parchment diffuser strips",
+          },
+          {
+            title: "Weave pleated bands around steel spokes",
+            instruction:
+              "Weave the pleated paper strips in and out of the radial grille bars and secure ends cleanly with small tape tabs.",
+            actionType: "thread",
+            tip: "Leave a gap at the front center hub for easy LED access.",
+            diagramCaption: "Weave pleated diffuser bands across cage",
+          },
+          {
+            title: "Clip cool LED puck & test articulated glow",
+            instruction:
+              "Seat a cool battery LED puck inside the rear hub, close the front grille, and tilt toward your desk.",
+            actionType: "test",
+            tip: "Verify cool temperature and glare-free diffusion.",
+            diagramCaption: "Test diffused directional studio lighting",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Weighted Articulating Base",
+            shape: "cylinder",
+            material: "rubber",
+            position: [0, -0.72, 0],
+            scale: [1.05, 0.24, 1.05],
+            colorHex: "#383532",
+            calloutIndex: 1,
+            description: "Heavy swivel desk stand",
+          },
+          {
+            id: "p2",
+            label: "Pleated Parchment Shade Cage",
+            shape: "dome",
+            material: "cardboard",
+            position: [0, 0.2, 0],
+            scale: [1.24, 1.2, 0.6],
+            colorHex: "#F2EADF",
+            calloutIndex: 2,
+            description: "Wire fan grille woven with glowing paper louvers",
+          },
+        ],
+      },
+    };
+  }
+
+  if (profileKey === "clothes") {
+    return {
+      PRACTICAL: {
+        name: "Pocketed Denim Roll-Up Craft Tool & Brush Wrap",
+        category: "Portable Workshop Storage",
+        oneLineDescription:
+          "Turns sturdy denim legs, hemmed cuffs, and intact back pockets into a tie-up roll protecting scissors, chisels, rulers, and brushes.",
+        purpose:
+          "Keeps sharp craft tools organized and cushioned inside a backpack or studio drawer.",
+        originalObjectContribution:
+          "Reuses factory-reinforced double-stitched pockets, belt loops, and heavy twill seams that handle metal tool tips effortlessly.",
+        materialsReused: ["Denim trouser legs or heavy shirt panels", "Original back pockets", "Waistband tie strip"],
+        additionalMaterials: ["Heavy cotton sewing thread", "Fabric chalk"],
+        requiredTools: ["Fabric scissors", "Sewing needle (or sewing machine)", "Ruler"],
+        functionalityExplanation:
+          "Laying two rectangular panels flat with a stitched multi-slot pocket band across the lower half lets tools slip upright into individual sleeves, folding top flap down before rolling shut.",
+        dimensions: "42 cm W × 28 cm H (open) / 9 cm Rolled",
+        sustainabilityValue:
+          "Diverts durable woven denim from textile waste into heirloom-grade workshop gear.",
+        safetyConsiderations: [
+          "Use double-layer denim at the bottom fold so sharp chisel or scissor tips never poke through.",
+        ],
+        testingValidation: [
+          "Load 6 craft tools, fold protective top flap down, tie strap tightly, and shake gently to verify zero tool slip.",
+        ],
+        possibleImprovements: [
+          "Sew a mini zipper pouch from old jacket pockets for screws and erasers.",
+        ],
+        steps: [
+          {
+            title: "Cut intact denim leg & pocket panels",
+            instruction:
+              "Cut a 42 × 28 cm main backing rectangle plus a 42 × 16 cm pocket strip from sturdy un-torn denim sections.",
+            actionType: "cut",
+            tip: "Use an original finished pant hem as the upper lip of your pocket strip.",
+            diagramCaption: "Cut main backing sheet and hemmed pocket strip",
+          },
+          {
+            title: "Mark graded tool slots (3 cm to 7 cm wide)",
+            instruction:
+              "Lay your actual scissors, pens, rulers, and brushes across the pocket strip and chalk vertical stitch lines around each.",
+            actionType: "measure",
+            tip: "Leave 1 cm finger clearance inside wider tool bays.",
+            diagramCaption: "Mark custom vertical dividers for tools",
+          },
+          {
+            title: "Backstitch bottom & divider channels",
+            instruction:
+              "Sew the pocket strip along the bottom edge and stitch up each chalked divider line, locking top corners with extra bar-tack stitches.",
+            actionType: "join",
+            tip: "Double-stitch top pocket corners where tools slide in daily.",
+            diagramCaption: "Stitch reinforced vertical tool pockets",
+          },
+          {
+            title: "Attach waistband tie cords & load tools",
+            instruction:
+              "Sew two 45 cm waistband or shoelace strips onto the outer right edge, load your tools, roll snugly, and tie shut.",
+            actionType: "test",
+            tip: "Fold the top 5 cm flap down first before rolling to keep tools captured.",
+            diagramCaption: "Roll tool wrap and test tie retention",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Stitched Denim Backing",
+            shape: "panel",
+            material: "woven_fabric",
+            position: [0, 0, -0.05],
+            scale: [1.45, 1.05, 0.1],
+            colorHex: "#3E5369",
+            calloutIndex: 1,
+            description: "Heavy cotton twill backing with top protective flap",
+          },
+          {
+            id: "p2",
+            label: "Slotted Tool Pocket Tier",
+            shape: "box",
+            material: "woven_fabric",
+            position: [0, -0.25, 0.08],
+            scale: [1.38, 0.55, 0.16],
+            colorHex: "#546D87",
+            calloutIndex: 2,
+            description: "Custom-stitched sleeves for brushes, rulers & shears",
+          },
+        ],
+      },
+      UNEXPECTED: {
+        name: "Braided T-Shirt Yarn Thermal Pot Trivet & Coaster Set",
+        category: "Tableware & Textile Craft",
+        oneLineDescription:
+          "Slices old knit T-shirts into continuous t-shirt yarn, braids three strands, and coils them into thick heat-insulating trivets.",
+        purpose:
+          "Protects wooden dining tables and desks from hot kettles, mugs, and baking dishes with zero retail fabric.",
+        originalObjectContribution:
+          "Cotton jersey knit curls naturally into plush rounded yarn cords when cut across the grain and stretched.",
+        materialsReused: ["2–3 worn cotton T-shirts"],
+        additionalMaterials: ["Heavy upholstery or crochet cotton thread"],
+        requiredTools: ["Sharp fabric scissors", "Tapestry needle", "Safety pin"],
+        functionalityExplanation:
+          "Coiling a thick 3-strand knit braid spirally and whip-stitching underneath builds a dense 1.5 cm thermal cushion with natural cotton heat tolerance.",
+        dimensions: "22 cm Diameter Trivet + Two 10 cm Coasters",
+        sustainabilityValue:
+          "Upcycles stained or faded cotton tees that cannot be donated into washable, plastic-free kitchenware.",
+        safetyConsiderations: [
+          "Use 100% cotton garments only for hot-pot trivets—avoid polyester blends that soften under boiling pans.",
+        ],
+        testingValidation: [
+          "Place a hot kettle on the finished trivet for 2 minutes and feel underside wood temperature.",
+        ],
+        possibleImprovements: [
+          "Mix terracotta, cream, and navy tees for a tricolor marled spiral.",
+        ],
+        steps: [
+          {
+            title: "Cut continuous 3 cm T-shirt yarn strips",
+            instruction:
+              "Slice below the armpits into 3 cm rings, connect diagonally, and stretch firmly so strips curl into smooth rounded jersey yarn.",
+            actionType: "cut",
+            tip: "Stretching curls raw fabric edges inward automatically.",
+            diagramCaption: "Slice and stretch jersey into smooth yarn cords",
+          },
+          {
+            title: "Anchor & braid 3 thick yarn strands",
+            instruction:
+              "Knot three strands together, pin to a cushion or clamp, and braid evenly for 2.5 meters.",
+            actionType: "thread",
+            tip: "Keep braiding tension consistent so the spiral coil lies flat.",
+            diagramCaption: "Braid three jersey strands into flat cord",
+          },
+          {
+            title: "Coil spiral & whip-stitch underside",
+            instruction:
+              "Coil the braid flat on a table and whip-stitch adjacent braid edges from the underside using heavy cotton thread.",
+            actionType: "join",
+            tip: "Work flat on a tabletop—holding it in air causes cupping.",
+            diagramCaption: "Whip-stitch spiral coils cleanly from underside",
+          },
+          {
+            title: "Steam-press flat & test heat barrier",
+            instruction:
+              "Tuck final tails neatly into the underside seam and rest a warm kettle or mug on top to confirm flat stability.",
+            actionType: "test",
+            tip: "Machine-washable on cold gentle cycle.",
+            diagramCaption: "Verify flat lay and thermal insulation",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Coiled Cotton Braid Pad",
+            shape: "cylinder",
+            material: "woven_fabric",
+            position: [0, -0.35, 0],
+            scale: [1.35, 0.22, 1.35],
+            colorHex: "#7C8B6A",
+            calloutIndex: 1,
+            description: "Plush spiraled 3-strand knit trivet cushion",
+          },
+        ],
+      },
+      EXPERIMENTAL: {
+        name: "Tensioned Dowel Door-Back Denim Pocket Matrix",
+        category: "Vertical Organization",
+        oneLineDescription:
+          "Suspends stitched jeans pockets and belt-loop tool hooks from a wooden crossbar for modular entryway or desk-side storage.",
+        purpose:
+          "Turns unused closet doors or narrow wall strips into grab-and-go pockets for notebooks, chargers, and scissors.",
+        originalObjectContribution:
+          "Copper-riveted jeans pockets handle far heavier loads than thin plastic over-door organizers.",
+        materialsReused: ["Old jeans panels", "Original riveted back pockets", "Belt loops"],
+        additionalMaterials: ["40 cm wooden dowel or bamboo pole", "Jute cord (1.2 m)"],
+        requiredTools: ["Fabric scissors", "Needle & heavy thread", "Ruler"],
+        functionalityExplanation:
+          "Sewing top casing loops over a rigid wooden dowel distributes load evenly across the hanging cord, while belt loops act as clip-on carabiner/tool tabs.",
+        dimensions: "40 cm W × 58 cm H",
+        sustainabilityValue: "Replaces disposable synthetic hanging organizers.",
+        safetyConsiderations: ["Knot jute hanger securely with a bowline or square knot."],
+        testingValidation: ["Load pockets with notebooks and small hand tools for 10 minutes."],
+        possibleImprovements: ["Slip a stiff cardboard sheet into a rear sleeve for extra wall flatness."],
+        steps: [
+          {
+            title: "Trim denim leg backplate & salvage 4 pockets",
+            instruction: "Cut a 36 × 52 cm denim rectangle and harvest four intact pockets leaving 1.5 cm seam margins.",
+            actionType: "cut",
+            tip: "Leave copper rivets intact on corners for authentic strength.",
+            diagramCaption: "Harvest intact riveted jeans pockets",
+          },
+          {
+            title: "Stitch wooden dowel top sleeve",
+            instruction: "Fold top 5 cm backward and stitch across to form a sturdy dowel rod tunnel.",
+            actionType: "fold",
+            tip: "Test dowel sliding fit before stitching final corner.",
+            diagramCaption: "Fold and stitch top dowel suspension tunnel",
+          },
+          {
+            title: "Sew tiered pockets & belt-loop tool tabs",
+            instruction: "Pin pockets in two neat rows and sew around three sides, tucking salvaged belt loops along bottom hem.",
+            actionType: "join",
+            tip: "Reinforce top left/right pocket corners with X-stitches.",
+            diagramCaption: "Mount riveted pockets and belt loops",
+          },
+          {
+            title: "Insert dowel, tie cord & load-test",
+            instruction: "Thread dowel and hanging cord, hang on a hook, and stock pockets with studio tools.",
+            actionType: "test",
+            tip: "Keep heaviest items in lower pockets.",
+            diagramCaption: "Verify level suspension under full load",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Dowel Crossbar",
+            shape: "rod",
+            material: "wood_grain",
+            position: [0, 0.85, 0],
+            scale: [1.45, 0.12, 0.12],
+            colorHex: "#B6885E",
+            calloutIndex: 1,
+            description: "Supports pocket matrix cleanly without sagging",
+          },
+          {
+            id: "p2",
+            label: "Riveted Denim Pocket Panel",
+            shape: "panel",
+            material: "woven_fabric",
+            position: [0, 0, 0],
+            scale: [1.25, 1.4, 0.12],
+            colorHex: "#465E76",
+            calloutIndex: 2,
+            description: "Multi-pocket hanging organizer with belt loops",
+          },
+        ],
+      },
+    };
+  }
+
+  if (profileKey === "tin_can") {
+    return {
+      PRACTICAL: {
+        name: "Magnetic Steel-Tin Wall Spice & Hardware Pods",
+        category: "Vertical Pantry & Bench Storage",
+        oneLineDescription:
+          "Turns empty rolled-rim steel tins into magnetic or oak-rail mounted storage pods for screws, spices, or markers.",
+        purpose: "Frees countertop and desk space using vertical steel surfaces or a narrow wood strip.",
+        originalObjectContribution:
+          "Tin-plated steel cans are naturally ferromagnetic and already have stiffrolled safety rims.",
+        materialsReused: ["2–3 clean empty steel tin cans"],
+        additionalMaterials: ["Strong neodymium disc magnets or oak batten + screws", "Kraft paper labels"],
+        requiredTools: ["Screwdriver", "Sandpaper (120-grit)", "Strong adhesive or tape"],
+        functionalityExplanation:
+          "Mounting tins upright onto a horizontal oak cleat (or bonding magnets to the stamped base) snaps metal containers onto fridges, tool boards, or shelf edges.",
+        dimensions: "30 cm W × 11 cm H × 9 cm D",
+        sustainabilityValue: "Diverts steel cans directly into durable workshop hardware bins.",
+        safetyConsiderations: ["Ensure original can-opener edge is smooth or taped with kraft tape before reaching inside."],
+        testingValidation: ["Load tins with 250 g of hardware or pens and verify magnet/screw grip."],
+        possibleImprovements: ["Wrap a strip of terracotta or kraft cardstock around the middle ribs."],
+        steps: [
+          {
+            title: "Wash tins & smooth top inner seam",
+            instruction: "Soak off paper labels, dry thoroughly to prevent rust, and press down any sharp opener tabs with pliers.",
+            actionType: "finish",
+            tip: "Hairdryer warms stubborn label glue for clean peeling.",
+            diagramCaption: "Clean steel tins and flatten inner rim burr",
+          },
+          {
+            title: "Mount magnets or drill oak rail holes",
+            instruction: "Glue two strong magnets to the flat tin base OR drill 2 screw holes near the back rim to bolt onto an oak batten.",
+            actionType: "puncture",
+            tip: "Use a center punch or nail dimple so drill bits never skate on curved tin.",
+            diagramCaption: "Prepare magnetic base or rear oak mount holes",
+          },
+          {
+            title: "Wrap tactile kraft grip band & labels",
+            instruction: "Wrap a 3 cm kraft or leatherette strip around the waist and label contents cleanly.",
+            actionType: "mount",
+            tip: "Leaves shiny brushed steel ribs visible top and bottom.",
+            diagramCaption: "Add kraft label band and mount pods",
+          },
+          {
+            title: "Load hardware & test holding shear",
+            instruction: "Snap pods onto a steel tool board or fridge and verify zero downward slide.",
+            actionType: "test",
+            tip: "Rough up glossy magnet backs with sandpaper before gluing.",
+            diagramCaption: "Test full-load vertical hold",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Brushed Steel Tin Shell",
+            shape: "cylinder",
+            material: "brushed_metal",
+            position: [0, 0, 0],
+            scale: [0.95, 1.05, 0.95],
+            colorHex: "#9BA2A8",
+            calloutIndex: 1,
+            description: "Ribbed magnetic steel container with rolled rim",
+          },
+          {
+            id: "p2",
+            label: "Kraft Grip Label Band",
+            shape: "cylinder",
+            material: "terracotta",
+            position: [0, -0.2, 0],
+            scale: [0.98, 0.3, 0.98],
+            colorHex: "#D98A6C",
+            calloutIndex: 2,
+            description: "Tactile label band covering center ribs",
+          },
+        ],
+      },
+      UNEXPECTED: {
+        name: "Ice-Frozen Punched Constellation Lantern Sconce",
+        category: "Ambient Craft Lighting",
+        oneLineDescription:
+          "Freezes water solid inside a tin can so nail-punched star patterns create crisp light beams without crushing the metal walls.",
+        purpose: "Casts cozy speckled geometric light across patios, balconies, or bedside tables.",
+        originalObjectContribution:
+          "Steel tin walls withstand outdoor warmth safely, while the ice-block trick lets anyone punch crisp pinholes cleanly at home.",
+        materialsReused: ["Empty ribbed steel tin can"],
+        additionalMaterials: ["Paper pattern wrap", "Wire bail handle", "Battery LED tea-light"],
+        requiredTools: ["Hammer", "Nail or awl", "Pliers"],
+        functionalityExplanation:
+          "Solid ice supports the thin steel cylinder from inside while hammering nail holes, leaving zero dents. Melting the ice reveals clean starlight apertures.",
+        dimensions: "8.5 cm Diameter × 11.5 cm H",
+        sustainabilityValue: "Creates artisanal patio lighting from kitchen pantry tins.",
+        safetyConsiderations: ["Dry tin completely after ice melts to avoid rust; prefer cool LED tea-lights indoors."],
+        testingValidation: ["Switch on LED tea-light inside in a dim room to inspect crisp starry projections."],
+        possibleImprovements: ["Brush exterior with matte charcoal or terracotta spray paint."],
+        steps: [
+          {
+            title: "Freeze water solid inside clean tin",
+            instruction: "Fill clean tin with water leaving 1 cm headspace and freeze solid overnight.",
+            actionType: "measure",
+            tip: "Solid ice prevents the thin steel cylinder from collapsing under hammer taps.",
+            diagramCaption: "Freeze solid ice core inside tin can",
+          },
+          {
+            title: "Tape constellation pattern & nail-punch",
+            instruction: "Wrap a dotted paper template around the frozen tin and tap 1–2 mm pinholes sharply with a nail and hammer.",
+            actionType: "puncture",
+            tip: "Vary small and medium nails for starry depth.",
+            diagramCaption: "Hammer starry pinhole pattern into frozen wall",
+          },
+          {
+            title: "Melt ice, dry & fit wire bail handle",
+            instruction: "Run warm water to slip the ice out, dry thoroughly, punch two top rim holes, and twist a stiff wire hanging bail.",
+            actionType: "thread",
+            tip: "Keep bail height above 14 cm for easy carrying.",
+            diagramCaption: "Dry tin and attach twisted wire handle",
+          },
+          {
+            title: "Illuminate & test pattern projection",
+            instruction: "Drop a glowing LED tea-light inside and test light speckles on nearby walls.",
+            actionType: "test",
+            tip: "Works beautifully hung along balcony railings.",
+            diagramCaption: "Test starry ambient projection in dim room",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Perforated Steel Sconce",
+            shape: "cylinder",
+            material: "brushed_metal",
+            position: [0, -0.05, 0],
+            scale: [0.95, 1.05, 0.95],
+            colorHex: "#8D9399",
+            calloutIndex: 1,
+            description: "Dent-free steel wall punched with starry apertures",
+          },
+        ],
+      },
+      EXPERIMENTAL: {
+        name: "Slotted Twine, Ribbon & Tape Bench Dispenser",
+        category: "Studio Dispenser",
+        oneLineDescription:
+          "Suspends a twine or tape spool on a dowel axle inside a tin can with a side feed port and fold-down serrated cutter tab.",
+        purpose: "Stops craft twine and masking tape rolls from unraveling across your workbench.",
+        originalObjectContribution:
+          "Stiff steel cylinder encloses spools cleanly while the rolled rim and wooden lid keep dust out.",
+        materialsReused: ["Tall coffee or food tin can"],
+        additionalMaterials: ["12 cm thin wood dowel", "Scrap cardboard top lid", "Serrated foil-box blade strip"],
+        requiredTools: ["Nail & hammer", "Tin snips or heavy scissors", "Masking tape"],
+        functionalityExplanation:
+          "Thread a wooden axle horizontally across two opposite nail holes; twine feeds cleanly out a taped grommet port on the front wall.",
+        dimensions: "10 cm Diameter × 13 cm H",
+        sustainabilityValue: "Replaces plastic desktop tape and string dispensers.",
+        safetyConsiderations: ["Tape over any cut metal side-slot edges thoroughly so twine never frays and fingers stay safe."],
+        testingValidation: ["Pull 1 meter of twine steadily to confirm smooth snag-free rotation."],
+        possibleImprovements: ["Weight bottom with marbles or pebbles for single-handed tearing."],
+        steps: [
+          {
+            title: "Mark & punch axle + feed port holes",
+            instruction: "Mark opposing center holes 6 cm up for the dowel axle and one front exit hole 3 cm up.",
+            actionType: "measure",
+            tip: "Line the front twine exit hole with a folded ring of masking tape.",
+            diagramCaption: "Mark dowel axle holes and front twine exit",
+          },
+          {
+            title: "Load spool onto wooden axle inside tin",
+            instruction: "Slide wooden dowel through one side, thread twine spool inside, and push dowel through the far wall.",
+            actionType: "thread",
+            tip: "Cap dowel ends with tight rubber bands so axle cannot slide out.",
+            diagramCaption: "Mount twine spool on dowel axle inside tin",
+          },
+          {
+            title: "Tape-seal exit port & attach cutter tab",
+            instruction: "Pull twine tail through front exit hole and mount a cardboard top dust cap.",
+            actionType: "mount",
+            tip: "Add pebbles in the bottom base for crisp one-hand pulls.",
+            diagramCaption: "Seat dust lid and feed port collar",
+          },
+          {
+            title: "Test smooth tangle-free pulling",
+            instruction: "Pull several lengths of twine to confirm low friction and zero unraveling.",
+            actionType: "test",
+            tip: "Swap spools in 10 seconds by slipping the dowel out.",
+            diagramCaption: "Verify snag-free bench dispensing",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Steel Dispenser Drum",
+            shape: "cylinder",
+            material: "brushed_metal",
+            position: [0, -0.05, 0],
+            scale: [0.95, 1.05, 0.95],
+            colorHex: "#9BA2A8",
+            calloutIndex: 1,
+            description: "Enclosed cylinder housing twine spool",
+          },
+          {
+            id: "p2",
+            label: "Dowel Spool Axle",
+            shape: "rod",
+            material: "wood_grain",
+            position: [0, 0, 0],
+            scale: [1.25, 0.14, 0.14],
+            colorHex: "#B6885E",
+            calloutIndex: 2,
+            description: "Removable axle letting spool spin cleanly",
+          },
+        ],
+      },
+    };
+  }
+
+  if (profileKey === "glass_jar") {
+    return {
+      PRACTICAL: {
+        name: "Under-Shelf Twist-Lock Hardware & Spice Jars",
+        category: "Zero-Footprint Storage",
+        oneLineDescription:
+          "Screws metal jar lids directly beneath a wooden shelf or desk underside so clear glass jars twist on/off suspended overhead.",
+        purpose: "Keeps screws, beads, spices, or tea visible while freeing 100% of desk or counter space.",
+        originalObjectContribution:
+          "Clear glass makes contents instantly identifiable without opening, while factory screw threads support weight cleanly.",
+        materialsReused: ["Clean glass jars", "Original threaded metal screw lids"],
+        additionalMaterials: ["2 small pan-head wood screws per lid", "Scrap wood shelf cleat"],
+        requiredTools: ["Hammer & small nail (for lid starter holes)", "Screwdriver"],
+        functionalityExplanation:
+          "Driving two spaced screws through the metal lid into a shelf underside prevents the lid from spinning when you twist the glass jar on or off with one hand.",
+        dimensions: "9 cm Diameter × 14 cm H (per jar)",
+        sustainabilityValue: "Turns pantry jars into zero-plastic modular workshop drawers.",
+        safetyConsiderations: [
+          "Never drill or puncture glass—only screw through the metal lids.",
+          "Use two screws per lid so torque cannot loosen a single center screw.",
+        ],
+        testingValidation: [
+          "Fill jar with 300 g of metal screws, twist up onto mounted lid, and verify snug quarter-turn lock.",
+        ],
+        possibleImprovements: ["Label lid rims for quick seated identification."],
+        steps: [
+          {
+            title: "Wash jars & punch 2 screw holes per metal lid",
+            instruction: "Lay metal lid face-down on scrap wood and tap two nail holes 3 cm apart through the lid.",
+            actionType: "puncture",
+            tip: "Using two spaced screws stops the lid from rotating when twisting the jar.",
+            diagramCaption: "Punch two spaced mounting holes in metal lid",
+          },
+          {
+            title: "Screw lids beneath wooden shelf lip",
+            instruction: "Space lid positions 12 cm apart under a shelf or workbench overhang and drive two short wood screws per lid.",
+            actionType: "mount",
+            tip: "Verify jar glass clears the back wall before driving screws.",
+            diagramCaption: "Screw metal lids beneath shelf underside",
+          },
+          {
+            title: "Fill glass jars & twist-lock overhead",
+            instruction: "Sort screws, craft beads, or dry pantry spices into the clean jars and twist snugly into mounted lids.",
+            actionType: "test",
+            tip: "Keep heaviest jars under thick solid wood shelves only.",
+            diagramCaption: "Twist-lock loaded jars and test thread grip",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Mounted Steel Screw Lid",
+            shape: "cylinder",
+            material: "brushed_metal",
+            position: [0, 0.55, 0],
+            scale: [0.88, 0.16, 0.88],
+            colorHex: "#D98A6C",
+            calloutIndex: 1,
+            description: "Dual-screw anchored metal lid beneath shelf",
+          },
+          {
+            id: "p2",
+            label: "Clear Glass Storage Jar",
+            shape: "cylinder",
+            material: "pet_plastic",
+            position: [0, -0.1, 0],
+            scale: [0.85, 1.05, 0.85],
+            colorHex: "#CBE6E1",
+            calloutIndex: 2,
+            description: "Visible glass body twisting cleanly overhead",
+          },
+        ],
+      },
+      UNEXPECTED: {
+        name: "Self-Sustaining Charcoal & Moss Closed Micro-Terrarium",
+        category: "Botanical Ecology",
+        oneLineDescription:
+          "Layers gravel, charcoal, moss, and ferns inside a clear glass jar to create a self-watering miniature forest ecosystem.",
+        purpose: "Brings low-maintenance living greenery to desks using trapped condensation cycles.",
+        originalObjectContribution:
+          "Crystal-clear glass lets sunlight enter while locking humidity cleanly inside.",
+        materialsReused: ["Clear glass jar with tight screw lid"],
+        additionalMaterials: ["Washed pebbles", "Activated charcoal", "Potting soil & woodland moss"],
+        requiredTools: ["Long spoon or chopsticks", "Spray mist bottle"],
+        functionalityExplanation:
+          "Moisture evaporates from damp soil, condenses on glass walls, and drips back down to moss roots—requiring watering only every few months.",
+        dimensions: "10 cm Diameter × 16 cm H",
+        sustainabilityValue: "Turns recycled glassware into living educational science vessels.",
+        safetyConsiderations: ["Place in bright indirect light—direct midday sun overheats sealed glass."],
+        testingValidation: ["Check morning glass fogging; wipe excess if heavy droplets obscure view for days."],
+        possibleImprovements: ["Add a small river stone landscape accent."],
+        steps: [
+          {
+            title: "Sterilize jar & layer 2 cm drainage pebbles",
+            instruction: "Wash jar with warm soapy water, dry, and spoon 2 cm clean pebbles across the base.",
+            actionType: "mount",
+            tip: "Rinse pebbles well so glass stays crystal clear.",
+            diagramCaption: "Build clean pebble drainage base",
+          },
+          {
+            title: "Add thin charcoal filter & 3 cm soil",
+            instruction: "Sprinkle 0.5 cm activated charcoal over stones followed by 3 cm moist potting soil.",
+            actionType: "join",
+            tip: "Charcoal prevents stale smells inside closed glass.",
+            diagramCaption: "Layer charcoal filter and potting soil",
+          },
+          {
+            title: "Tuck moss & mini fern with chopsticks",
+            instruction: "Press cushions of green moss gently onto soil, mist lightly, and seal lid.",
+            actionType: "test",
+            tip: "Crack lid open 1 hour if heavy condensation persists.",
+            diagramCaption: "Plant moss canopy and balance humidity",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "Optical Glass Chamber",
+            shape: "cylinder",
+            material: "pet_plastic",
+            position: [0, 0, 0],
+            scale: [0.92, 1.15, 0.92],
+            colorHex: "#D5ECE7",
+            calloutIndex: 1,
+            description: "Crystal clear sealed terrarium jar",
+          },
+          {
+            id: "p2",
+            label: "Moss Ecosystem Core",
+            shape: "dome",
+            material: "woven_fabric",
+            position: [0, -0.2, 0],
+            scale: [0.8, 0.45, 0.8],
+            colorHex: "#7C8B6A",
+            calloutIndex: 2,
+            description: "Self-cycling moss over gravel & charcoal",
+          },
+        ],
+      },
+      EXPERIMENTAL: {
+        name: "Water-Lens Botanical Specimen & Warm LED Desk Globe",
+        category: "Optics & Ambient Decor",
+        oneLineDescription:
+          "Illuminates a water-filled glass jar holding preserved botanical sprigs from beneath via a recessed wood plinth and cool LED puck.",
+        purpose: "Magnifies leaves and stems into a warm glowing ambient desk lamp.",
+        originalObjectContribution:
+          "Curved water-filled glass acts as a cylindrical magnifying lens.",
+        materialsReused: ["Clear glass jar & metal lid"],
+        additionalMaterials: ["Notched cardboard or wood ring base", "LED tea-light puck", "Fresh rosemary or fern sprig"],
+        requiredTools: ["Scissors", "Ruler"],
+        functionalityExplanation:
+          "A battery LED puck recessed beneath the jar projects soft upward rays through refracting water and backlit leaves.",
+        dimensions: "10 cm Diameter × 17 cm H",
+        sustainabilityValue: "Creates artisanal studio lighting from kitchen glass.",
+        safetyConsiderations: ["Use sealed battery LED puck underneath—never mains wires near water."],
+        testingValidation: ["Confirm jar sits stably inside base collar before filling water."],
+        possibleImprovements: ["Add one drop of glycerin to slow water bubbles."],
+        steps: [
+          {
+            title: "Build recessed LED ring plinth",
+            instruction: "Cut two 10 cm cardboard or wood rings with a 4.5 cm center pocket holding the LED puck.",
+            actionType: "cut",
+            tip: "Line pocket bottom with foil for extra upward bounce.",
+            diagramCaption: "Cut recessed plinth pocket for LED puck",
+          },
+          {
+            title: "Arrange botanical sprig & fill clear water",
+            instruction: "Tuck a clean fern frond inside the jar, fill with water, and tighten lid.",
+            actionType: "mount",
+            tip: "Let tap water sit 1 hour first to minimize micro-bubbles.",
+            diagramCaption: "Seal botanical sprig inside water lens jar",
+          },
+          {
+            title: "Seat jar onto glowing LED base",
+            instruction: "Switch on LED puck, seat jar cleanly into collar, and test glow in dim studio light.",
+            actionType: "test",
+            tip: "Replace water weekly if using fresh cuttings.",
+            diagramCaption: "Verify optical refraction and base stability",
+          },
+        ],
+        assemblyParts: [
+          {
+            id: "p1",
+            label: "LED Plinth Collar",
+            shape: "cylinder",
+            material: "wood_grain",
+            position: [0, -0.6, 0],
+            scale: [1.0, 0.25, 1.0],
+            colorHex: "#B6885E",
+            calloutIndex: 1,
+            description: "Elevates jar over recessed LED light",
+          },
+          {
+            id: "p2",
+            label: "Water-Magnified Specimen Jar",
+            shape: "cylinder",
+            material: "pet_plastic",
+            position: [0, 0.1, 0],
+            scale: [0.88, 1.1, 0.88],
+            colorHex: "#CBE6E1",
+            calloutIndex: 2,
+            description: "Backlit glass lens magnifying botanicals",
+          },
+        ],
+      },
+    };
+  }
+
   return buildContextualArchetypes(analysis, goalText, batchSeed);
 }
 
@@ -1274,29 +2953,156 @@ function buildContextualArchetypes(
   const secondaryPart = analysis.reusableParts[1] ?? "structural frame";
   const material = analysis.materials[0] ?? "salvaged composite";
   const inferred = inferMaterialFinish(`${name} ${analysis.materials.join(" ")}`);
-  const goalPhrase = goalText.trim() || "daily creative workspace use";
+  const goalPhrase = goalText.trim() || "daily hands-on utility";
 
   const rotationOffset = batchSeed % 3;
 
-  const practicalTitles = [
-    `Slotted ${name} Desk & Studio Organizer`,
-    `Cantilevered ${name} Tool & Cable Station`,
-    `Modular ${name} Tabletop Caddy & Tray`,
-  ];
-  const unexpectedTitles = [
-    `Passive ${name} Botanical Terrarium & Wick Stand`,
-    `Nested ${name} Acoustic & Shelf Pocket Dock`,
-    `Suspended ${name} Micro-Herb & Supply Cradle`,
-  ];
-  const experimentalTitles = [
-    `Counterbalanced ${name} Kinetic Lamp & Reflector`,
-    `Gravity-Tensioned ${name} Articulated Easel`,
-    `Zero-Power ${name} Cooling & Drying Carousel`,
-  ];
+  const titlesByMaterial: Record<
+    PartMaterialFinish,
+    { practical: string[]; unexpected: string[]; experimental: string[] }
+  > = {
+    rubber: {
+      practical: [
+        `Non-Slip ${name} Anti-Vibration Pads & Wedge`,
+        `Bench-Grip ${name} Tool Cushion Mat`,
+        `Protective ${name} Cabinet & Door Bumper Set`,
+      ],
+      unexpected: [
+        `Hand-Carved ${name} Relief Print Stamp`,
+        `Waterproof ${name} Floating Key & Tag Fob`,
+        `Textured ${name} Clay & Pottery Pattern Roller`,
+      ],
+      experimental: [
+        `Friction-Slit ${name} Cable & Brush Wall Grip`,
+        `Spring-Tensioned ${name} Desk Cord Anchor`,
+        `Modular ${name} Squeegee & Bench Scraper`,
+      ],
+    },
+    woven_fabric: {
+      practical: [
+        `Stitched ${name} Roll-Up Tool & Brush Wrap`,
+        `Reinforced ${name} Produce & Market Sling`,
+        `Pocketed ${name} Bedside & Desk Caddy`,
+      ],
+      unexpected: [
+        `Braided ${name} Thermal Pot Trivet`,
+        `Upcycled ${name} Pressed-Leaf Book Cover`,
+        `Hanging ${name} Herb & Onion Air-Sack`,
+      ],
+      experimental: [
+        `Tensioned Dowel ${name} Door-Back Organizer`,
+        `Weighted ${name} Draft-Stopper & Wrist Rest`,
+        `Modular ${name} Acoustic Wall Pin-Panel`,
+      ],
+    },
+    wood_grain: {
+      practical: [
+        `Cantilevered ${name} Two-Tier Desk Riser`,
+        `Slotted ${name} Tablet, Mail & Key Dock`,
+        `Mortised ${name} Bench Clamp & Tool Tray`,
+      ],
+      unexpected: [
+        `Vertical ${name} Kitchen Herb & Utensil Ladder`,
+        `Carved ${name} Tea-Light & Planter Plinth`,
+        `Peg-Board ${name} Yarn & Spool Winding Frame`,
+      ],
+      experimental: [
+        `Pin-Locked ${name} Adjustable Drafting Lectern`,
+        `Counterbalanced ${name} Overhead Task Stand`,
+        `Folding ${name} Acoustic Phone Horn Cradle`,
+      ],
+    },
+    brushed_metal: {
+      practical: [
+        `Magnetic ${name} Wall Hardware & Tool Bar`,
+        `Weighted ${name} Soldering & Craft Third-Hand`,
+        `Riveted ${name} Desk Tray & Cable Guide`,
+      ],
+      unexpected: [
+        `Perforated ${name} Starlight LED Sconce`,
+        `Suspended ${name} Trailing Vine Trellis`,
+        `Chimed ${name} Wind & Balcony Garden Bell`,
+      ],
+      experimental: [
+        `Articulated ${name} Overhead Phone Copy-Stand`,
+        `Slotted ${name} Twine & Tape Bench Dispenser`,
+        `Parabolic ${name} Desk Lamp Reflector Shade`,
+      ],
+    },
+    terracotta: {
+      practical: [
+        `Weighted ${name} Brush, Tool & Honing Station`,
+        `Porous ${name} Evaporative Bread & Herb Keeper`,
+        `Stabilized ${name} Desk Instrument Cup`,
+      ],
+      unexpected: [
+        `Kintsugi-Style ${name} Succulent & Charcoal Dish`,
+        `Buried ${name} Olla Slow-Drip Garden Irrigator`,
+        `Scent-Diffusing ${name} Essential Oil Stone`,
+      ],
+      experimental: [
+        `Passive ${name} Ceramic Sound-Horn Dock`,
+        `Stacked ${name} Micro-Green Sprout Tower`,
+        `Pin-Hole ${name} Warm Clay Candle Lantern`,
+      ],
+    },
+    ceramic: {
+      practical: [
+        `Weighted ${name} Brush & Knife-Honing Caddy`,
+        `Glazed ${name} Paint-Water & Studio Well`,
+        `Heavy ${name} Bookend & Desk Tool Anchor`,
+      ],
+      unexpected: [
+        `Kintsugi-Accented ${name} Succulent Dish`,
+        `Charcoal-Bed ${name} Moss & Pebble Planter`,
+        `Layered ${name} Mosaic Coaster Tray`,
+      ],
+      experimental: [
+        `Passive ${name} Parabolic Phone Amplifier`,
+        `Acoustic ${name} Bell Chime & Desk Resonance Cup`,
+        `Inverted ${name} LED Ambient Rim Diffuser`,
+      ],
+    },
+    cardboard: {
+      practical: [
+        `Cross-Slotted ${name} Desk & Charging Dock`,
+        `Notched ${name} Drawer & Notebook Divider Grid`,
+        `Reinforced ${name} Cable-Hiding Monitor Riser`,
+      ],
+      unexpected: [
+        `Laminated ${name} Acoustic Study Partition`,
+        `Corrugated ${name} Cat Scratcher & Lounge Tray`,
+        `Layered ${name} Relief Stamp & Stencil Press`,
+      ],
+      experimental: [
+        `Gear-Notched ${name} 5-Angle Sketchbook Easel`,
+        `Louvered ${name} Warm LED Architectural Shade`,
+        `Slot-Together ${name} Zero-Glue Laptop Stand`,
+      ],
+    },
+    pet_plastic: {
+      practical: [
+        `Trimmed ${name} Clear Parts & Cable Bin`,
+        `Nested ${name} Stackable Desk Supply Cups`,
+        `Cut-Collar ${name} Paint & Brush Rinse Station`,
+      ],
+      unexpected: [
+        `Capillary ${name} Self-Watering Herb Vessel`,
+        `Mini-Cloche ${name} Seedling Humidity Dome`,
+        `Bird-Safe ${name} Gravity Seed Dispenser`,
+      ],
+      experimental: [
+        `Sanded ${name} 360-Degree LED Night Lantern`,
+        `Water-Lens ${name} Magnifying Specimen Stand`,
+        `Slotted ${name} Vertical Wall Planter Pocket`,
+      ],
+    },
+  };
 
-  const practicalName = practicalTitles[rotationOffset];
-  const unexpectedName = unexpectedTitles[rotationOffset];
-  const experimentalName = experimentalTitles[rotationOffset];
+  const bucket = titlesByMaterial[inferred.primary] ?? titlesByMaterial.pet_plastic;
+  const practicalName = bucket.practical[rotationOffset];
+  const unexpectedName = bucket.unexpected[rotationOffset];
+  const experimentalName = bucket.experimental[rotationOffset];
 
   return {
     PRACTICAL: {
@@ -1661,9 +3467,10 @@ function applyConstraintsToCostAndTime(
   let buildMinutes = baseMinutes;
   let difficulty = archetype.difficulty;
 
-  const budgetVal = Number(input.constraints.budgetPhp);
-  if (Number.isFinite(budgetVal) && budgetVal > 0 && costPhp > budgetVal) {
-    costPhp = Math.max(0, Math.round(budgetVal * 0.85));
+  const rawBudget = input.constraints.budgetPhp.trim();
+  const budgetVal = Number(rawBudget);
+  if (rawBudget !== "" && Number.isFinite(budgetVal) && budgetVal >= 0 && costPhp > budgetVal) {
+    costPhp = budgetVal === 0 ? 0 : Math.max(0, Math.round(budgetVal * 0.85));
   }
 
   const skill = normalizeText(input.constraints.skillLevel);
@@ -1697,9 +3504,9 @@ export function synthesizeLocalInventions(
   options?: { excludeNames?: string[]; batchSeed?: number }
 ): SynthesisResult {
   const analysis = analyzeObjectInput(input);
-  const combinedSource = normalizeText(
-    `${input.textDescription} ${input.photoFileName ?? ""}`
-  );
+  const activeText = getActiveModeText(input);
+  const cleanedFilename = input.mode === "photo" ? cleanPhotoFileName(input.photoFileName) : "";
+  const combinedSource = normalizeText(`${activeText} ${cleanedFilename}`);
   const matchedProfile = OBJECT_PROFILES.find((p) =>
     p.keywords.some((kw) => combinedSource.includes(kw))
   );

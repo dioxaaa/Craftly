@@ -16,6 +16,7 @@ export type CraftObjectKind =
   | "garment_denim"
   | "tin_jar"
   | "wood_crate"
+  | "slipper_rubber"
   | "generic";
 
 export type CraftOutputKind =
@@ -46,7 +47,9 @@ export function inferCraftVisualSpec(
     .toLowerCase();
 
   let objectKind: CraftObjectKind = "generic";
-  if (/bottle|pet |soda|water bottle|jug/.test(sourceBlob)) {
+  if (/slipper|flip-flop|flip flop|sandal|tsinelas|eva|foam sole|footwear/.test(sourceBlob)) {
+    objectKind = "slipper_rubber";
+  } else if (/bottle|pet |soda|water bottle|jug/.test(sourceBlob)) {
     objectKind = "pet_bottle";
   } else if (/umbrella|parasol|canopy|pongee|rib/.test(sourceBlob)) {
     objectKind = "umbrella";
@@ -1256,6 +1259,160 @@ function drawRealisticGenericAssembly(
   }
 }
 
+function drawRealisticSlipperOutput(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  baseY: number,
+  scale: number,
+  inventionName: string
+): void {
+  drawContactShadow(ctx, cx, baseY + 6 * scale, 82 * scale, 15 * scale, 0.28);
+  const lowerName = inventionName.toLowerCase();
+
+  ctx.save();
+  if (lowerName.includes("stamp") || lowerName.includes("print")) {
+    // Hand-carved EVA rubber relief print stamp mounted on oak wood block + stamped botanical card
+    // Kraft card on workbench
+    ctx.fillStyle = "#F7F1E5";
+    ctx.strokeStyle = "#4A3528";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(cx - 76 * scale, baseY - 22 * scale, 84 * scale, 30 * scale, 3 * scale);
+    ctx.fill();
+    ctx.stroke();
+
+    // Printed botanical leaf stamp impression in terracotta ink
+    ctx.fillStyle = "#D98A6C";
+    ctx.beginPath();
+    ctx.ellipse(cx - 38 * scale, baseY - 7 * scale, 16 * scale, 7 * scale, -0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Carved blue-slate EVA rubber sole plate + wood grip block resting beside card
+    const sx = cx + 22 * scale;
+    const sy = baseY - 12 * scale;
+    // Wooden backing block
+    ctx.fillStyle = "#C5976A";
+    ctx.strokeStyle = "#4A3528";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(sx - 34 * scale, sy - 42 * scale, 68 * scale, 28 * scale, 4 * scale);
+    ctx.fill();
+    ctx.stroke();
+    // Wooden knob handle
+    ctx.fillStyle = "#A4764B";
+    ctx.beginPath();
+    ctx.roundRect(sx - 12 * scale, sy - 64 * scale, 24 * scale, 22 * scale, 5 * scale);
+    ctx.fill();
+    ctx.stroke();
+    // Blue-teal EVA rubber stamp pad bonded underneath
+    ctx.fillStyle = "#2E6A85";
+    ctx.beginPath();
+    ctx.roundRect(sx - 32 * scale, sy - 14 * scale, 64 * scale, 14 * scale, 3 * scale);
+    ctx.fill();
+    ctx.stroke();
+    // Carved relief ridges visible on edge
+    ctx.strokeStyle = "#193F52";
+    for (let i = -2; i <= 2; i++) {
+      ctx.beginPath();
+      ctx.moveTo(sx + i * 10 * scale, sy - 6 * scale);
+      ctx.lineTo(sx + i * 10 * scale, sy);
+      ctx.stroke();
+    }
+  } else if (lowerName.includes("rack") || lowerName.includes("grip") || lowerName.includes("cable")) {
+    // Wall-mounted wooden cleat + slotted blue EVA rubber sole clamping handles/cables
+    ctx.fillStyle = "#C5976A";
+    ctx.strokeStyle = "#4A3528";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(cx - 74 * scale, baseY - 62 * scale, 148 * scale, 42 * scale, 5 * scale);
+    ctx.fill();
+    ctx.stroke();
+
+    // Ribbed blue rubber sole insert with 3 friction star-slits
+    ctx.fillStyle = "#2E6A85";
+    ctx.beginPath();
+    ctx.roundRect(cx - 62 * scale, baseY - 54 * scale, 124 * scale, 26 * scale, 10 * scale);
+    ctx.fill();
+    ctx.stroke();
+
+    // Clamped brush/broom dowel + dark cord gripped cleanly
+    for (const [gx, col] of [
+      [cx - 32 * scale, "#E0A952"],
+      [cx + 4 * scale, "#4A3528"],
+      [cx + 38 * scale, "#D98A6C"],
+    ] as const) {
+      ctx.strokeStyle = "#193F52";
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(gx - 8 * scale, baseY - 41 * scale);
+      ctx.lineTo(gx + 8 * scale, baseY - 41 * scale);
+      ctx.moveTo(gx, baseY - 49 * scale);
+      ctx.lineTo(gx, baseY - 33 * scale);
+      ctx.stroke();
+
+      ctx.fillStyle = col;
+      ctx.strokeStyle = "#1C1B19";
+      ctx.beginPath();
+      ctx.roundRect(gx - 4.5 * scale, baseY - 96 * scale, 9 * scale, 96 * scale, 4 * scale);
+      ctx.fill();
+      ctx.stroke();
+    }
+  } else {
+    // Ribbed EVA Rubber Doorstop Wedge + 4 Non-Slip Furniture/Appliance Pads
+    // Beveled blue-teal ribbed doorstop wedge
+    const wGrad = ctx.createLinearGradient(cx - 64 * scale, 0, cx + 22 * scale, 0);
+    wGrad.addColorStop(0, "#24576E");
+    wGrad.addColorStop(0.55, "#377C9B");
+    wGrad.addColorStop(1, "#1D475B");
+    ctx.fillStyle = wGrad;
+    ctx.strokeStyle = "#173442";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - 66 * scale, baseY);
+    ctx.lineTo(cx + 16 * scale, baseY);
+    ctx.lineTo(cx + 16 * scale, baseY - 34 * scale);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Ribbed grip grooves along top slope
+    ctx.strokeStyle = "rgba(215, 240, 250, 0.45)";
+    ctx.lineWidth = 1.2;
+    for (let i = 1; i <= 5; i++) {
+      const t = i / 6;
+      const gx = cx - 66 * scale + 82 * scale * t;
+      const gy = baseY - 34 * scale * t;
+      ctx.beginPath();
+      ctx.moveTo(gx, gy + 2 * scale);
+      ctx.lineTo(gx + 6 * scale, gy + 9 * scale);
+      ctx.stroke();
+    }
+
+    // Reused dark navy strap pull-loop on back of wedge
+    ctx.strokeStyle = "#1F2933";
+    ctx.lineWidth = 4.5 * scale;
+    ctx.beginPath();
+    ctx.arc(cx + 19 * scale, baseY - 17 * scale, 10 * scale, -Math.PI * 0.45, Math.PI * 0.45);
+    ctx.stroke();
+
+    // Stacked cut circular non-slip furniture/appliance pads beside wedge
+    for (const [px, py] of [
+      [cx + 52 * scale, baseY - 2 * scale],
+      [cx + 52 * scale, baseY - 12 * scale],
+      [cx + 52 * scale, baseY - 22 * scale],
+    ]) {
+      ctx.fillStyle = "#316F8B";
+      ctx.strokeStyle = "#173442";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.ellipse(px, py, 20 * scale, 7 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
 export function drawRealisticOutputScene(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -1272,6 +1429,9 @@ export function drawRealisticOutputScene(
   const scale = Math.min(width / 380, height / 260) * 1.18;
 
   switch (spec.objectKind) {
+    case "slipper_rubber":
+      drawRealisticSlipperOutput(ctx, cx, baseY, scale, invention.name);
+      break;
     case "pet_bottle":
       drawRealisticPetBottleOutput(ctx, cx, baseY, scale, spec.outputKind);
       break;
@@ -1603,6 +1763,45 @@ function drawRawSalvagedBase(
     ctx.beginPath();
     ctx.roundRect(cx - 28 * scale, cy - 28 * scale, 56 * scale, 56 * scale, 5 * scale);
     ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  if (objectKind === "slipper_rubber") {
+    ctx.save();
+    // Ribbed blue rubber flip-flop sole silhouette + snapped dark navy strap
+    const sGrad = ctx.createLinearGradient(cx - 58 * scale, cy - 22 * scale, cx + 58 * scale, cy + 22 * scale);
+    sGrad.addColorStop(0, "#2C6B88");
+    sGrad.addColorStop(0.5, "#3A82A3");
+    sGrad.addColorStop(1, "#21536B");
+    ctx.fillStyle = sGrad;
+    ctx.strokeStyle = "#173442";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(cx - 56 * scale, cy - 22 * scale, 112 * scale, 44 * scale, 20 * scale);
+    ctx.fill();
+    ctx.stroke();
+
+    // Ribbed footbed lines
+    ctx.strokeStyle = "rgba(20, 50, 66, 0.35)";
+    ctx.lineWidth = 1.1;
+    for (let rx = -36; rx <= 36; rx += 12) {
+      ctx.beginPath();
+      ctx.moveTo(cx + rx * scale, cy - 18 * scale);
+      ctx.lineTo(cx + rx * scale, cy + 18 * scale);
+      ctx.stroke();
+    }
+
+    // Broken Y-strap nubs
+    ctx.strokeStyle = "#1B242E";
+    ctx.lineWidth = 4.5 * scale;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(cx - 24 * scale, cy - 12 * scale);
+    ctx.lineTo(cx + 8 * scale, cy - 2 * scale);
+    ctx.moveTo(cx - 24 * scale, cy + 12 * scale);
+    ctx.lineTo(cx + 2 * scale, cy + 3 * scale);
     ctx.stroke();
     ctx.restore();
     return;

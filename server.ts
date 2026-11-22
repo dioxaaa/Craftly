@@ -1,8 +1,9 @@
 import express from "express";
+import http from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 import { DEFAULT_MODEL, FALLBACK_MODEL, IMAGE_GEN_MODEL } from "./src/config/ai.ts";
 
@@ -214,14 +215,19 @@ async function generateWithFallbackModel(
   const modelsToTry = [DEFAULT_MODEL, FALLBACK_MODEL];
   for (const modelName of modelsToTry) {
     try {
+      const config: Record<string, unknown> = {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: responseSchema as Record<string, unknown>,
+      };
+      if (modelName.startsWith("gemini-4")) {
+        config.thinkingConfig = { thinkingLevel: ThinkingLevel.LOW };
+      }
+
       const response = await ai.models.generateContent({
         model: modelName,
         contents: contents as string,
-        config: {
-          systemInstruction,
-          responseMimeType: "application/json",
-          responseSchema: responseSchema as Record<string, unknown>,
-        },
+        config,
       });
       if (response.text) {
         return response.text;
@@ -247,8 +253,10 @@ async function startServer() {
     try {
       const { input, excludeNames } = req.body as {
         input: {
-          mode?: string;
+          mode?: "text" | "photo" | "sketch";
           textDescription?: string;
+          photoNotes?: string;
+          sketchNotes?: string;
           photoFileName?: string;
           photoDataUrl?: string;
           sketchDataUrl?: string;
@@ -258,20 +266,52 @@ async function startServer() {
         excludeNames?: string[];
       };
 
+      const activeMode =
+        input?.mode === "photo" || input?.mode === "sketch"
+          ? input.mode
+          : "text";
+
       const systemInstruction =
-        "You are Craftly, an industrial design and sustainable upcycling studio. " +
-        "Analyze the user's salvaged object, materials, and goal, then generate EXACTLY 3 distinct, physically buildable invention concepts: " +
+        "You are Craftly, an authentic hands-on industrial craft & upcycling studio. " +
+        "Analyze the exact salvaged object provided—respecting its true physical material (rubber/EVA foam, rigid plastic, glass, ceramic, metal wire, wood, woven textile, paperboard), surface texture, structural strengths, and damage. " +
+        "Generate EXACTLY 3 genuinely distinct, hand-crafty, realistically buildable invention concepts: " +
         "1) PRACTICAL, 2) UNEXPECTED, and 3) EXPERIMENTAL. " +
-        "Never use emojis anywhere. Costs must be realistic estimates in Philippine Pesos (PHP). " +
+        "CRITICAL ACCURACY & UNIQUENESS RULES: " +
+        "- Never return generic cliché ideas ('desk organizer', 'terrarium', 'easel') unless genuinely tailored to that exact material's real-world mechanics. " +
+        "- Exploit what makes THAT specific object unique (e.g., EVA rubber slipper sole -> carved relief-print stamp block, ribbed anti-vibration pad/doorstop, friction-slit broom/cable grip rack; cracked ceramic mug -> unglazed foot-ring knife honer or acoustic speaker bell; broken umbrella -> ripstop hanging gear caddy or parabolic diffuser; fan wire grille -> suspended moss basket or tool carousel). " +
+        "- Every joint, cut, fastener, adhesive, and tool MUST physically work on that material (never suggest crimping glass, putting flames near plastic/foam, or drilling brittle stoneware with basic wood bits). " +
+        "- Strictly honor the user's goal and constraints (budget cap in PHP, tools on hand, beginner/intermediate/advanced skill level, space limit). " +
+        "- Never use emojis anywhere. Costs must be realistic Philippine Peso (PHP) estimates. " +
         "Each concept must have 4-5 clear steps with valid actionType (measure, cut, puncture, fold, thread, join, mount, finish, test) " +
         "and 3-4 assemblyParts with valid shape (cylinder, box, cone, ring, rod, panel, dome) and material " +
         "(pet_plastic, cardboard, brushed_metal, wood_grain, terracotta, woven_fabric, ceramic, rubber). " +
-        "Keep coordinates in [-0.8, 0.8] and scales in [0.12, 1.5] so the 3D workshop turntable assembly stays balanced. " +
-        "Write studioPrompt as a vivid, concrete product photography prompt describing the finished physical object in realistic detail, visible salvaged parts, authentic handmade joinery, and real-world contents (e.g., herbs in soil, pens in slots, warm bulb glow).";
+        "Keep coordinates in [-0.8, 0.8] and scales in [0.12, 1.5]. " +
+        "Write studioPrompt as a vivid, concrete product photography prompt describing the finished physical object in realistic detail, visible salvaged parts, authentic handmade joinery, and real-world contents.";
+
+      const modeDirective =
+        activeMode === "photo"
+          ? "[INPUT MODE: UPLOADED PHOTO] Inspect the attached photograph carefully FIRST to identify the exact object, material, color, texture, and damage. Treat user notes as supplementary context."
+          : activeMode === "sketch"
+            ? "[INPUT MODE: HAND-DRAWN SKETCH] Inspect the attached hand-drawn sketch carefully to interpret the drawn object silhouette, proportions, and parts alongside the user's sketch notes."
+            : "[INPUT MODE: TEXT DESCRIPTION] Analyze the exact object, material, and condition described below.";
+
+      const activeDescription =
+        activeMode === "photo"
+          ? (input?.photoNotes ?? "").trim()
+          : activeMode === "sketch"
+            ? (input?.sketchNotes ?? "").trim()
+            : (input?.textDescription ?? "").trim();
 
       const textPrompt = [
-        `Object description: ${input?.textDescription || "Everyday object"}`,
-        input?.photoFileName ? `Photo filename: ${input.photoFileName}` : "",
+        modeDirective,
+        activeDescription
+          ? `User object description/notes: ${activeDescription}`
+          : activeMode === "text"
+            ? "Object description: Everyday object"
+            : "No text notes provided—rely directly on visual inspection of the attached image.",
+        activeMode === "photo" && input?.photoFileName
+          ? `Photo filename hint: ${input.photoFileName}`
+          : "",
         `User goal: ${input?.goal || "Practical and imaginative everyday second life"}`,
         input?.constraints
           ? `Constraints: ${JSON.stringify(input.constraints)}`
@@ -285,7 +325,12 @@ async function startServer() {
 
       const parts: Array<Record<string, unknown>> = [{ text: textPrompt }];
       const imageAttachment =
-        parseDataUrl(input?.photoDataUrl) || parseDataUrl(input?.sketchDataUrl);
+        activeMode === "photo"
+          ? parseDataUrl(input?.photoDataUrl)
+          : activeMode === "sketch"
+            ? parseDataUrl(input?.sketchDataUrl)
+            : null;
+
       if (imageAttachment) {
         parts.unshift({
           inlineData: {
@@ -479,9 +524,17 @@ async function startServer() {
     }
   });
 
+  const httpServer = http.createServer(app);
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        allowedHosts: true,
+        ws: {
+          server: httpServer,
+        },
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);
@@ -493,7 +546,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Craftly studio server running on http://localhost:${PORT}`);
   });
 }

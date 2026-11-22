@@ -118,6 +118,8 @@ export interface UserConstraints {
 export interface SynthesisInput {
   mode: InputMode;
   textDescription: string;
+  photoNotes?: string;
+  sketchNotes?: string;
   photoFileName?: string;
   photoMimeType?: string;
   photoDataUrl?: string;

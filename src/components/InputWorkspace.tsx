@@ -78,7 +78,47 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
     });
   };
 
-  const handlePhotoFile = (file: File) => {
+  const compressImageFile = (file: File): Promise<{ dataUrl: string; mimeType: string }> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("read_error"));
+      reader.onload = () => {
+        if (typeof reader.result !== "string") {
+          reject(new Error("invalid_result"));
+          return;
+        }
+        const rawDataUrl = reader.result;
+        const img = new Image();
+        img.onerror = () => resolve({ dataUrl: rawDataUrl, mimeType: file.type });
+        img.onload = () => {
+          const maxDim = 1024;
+          const { width, height } = img;
+          if (!width || !height || (width <= maxDim && height <= maxDim && rawDataUrl.length < 350_000)) {
+            resolve({ dataUrl: rawDataUrl, mimeType: file.type });
+            return;
+          }
+          const scale = Math.min(1, maxDim / Math.max(width, height));
+          const targetW = Math.max(1, Math.round(width * scale));
+          const targetH = Math.max(1, Math.round(height * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve({ dataUrl: rawDataUrl, mimeType: file.type });
+            return;
+          }
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+          const compressed = canvas.toDataURL("image/jpeg", 0.84);
+          resolve({ dataUrl: compressed, mimeType: "image/jpeg" });
+        };
+        img.src = rawDataUrl;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handlePhotoFile = async (file: File) => {
     setPhotoError(null);
     if (!ACCEPTED_TYPES.includes(file.type.toLowerCase())) {
       setPhotoError(
@@ -93,22 +133,18 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        onChange({
-          ...input,
-          mode: "photo",
-          photoFileName: file.name,
-          photoMimeType: file.type,
-          photoDataUrl: reader.result,
-        });
-      }
-    };
-    reader.onerror = () => {
+    try {
+      const { dataUrl, mimeType } = await compressImageFile(file);
+      onChange({
+        ...input,
+        mode: "photo",
+        photoFileName: file.name,
+        photoMimeType: mimeType,
+        photoDataUrl: dataUrl,
+      });
+    } catch {
       setPhotoError("Could not read that image file. Try another photo.");
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -133,18 +169,23 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
     }
   };
 
-  const hasValidInput =
-    input.textDescription.trim().length >= 3 ||
-    Boolean(input.photoDataUrl) ||
-    Boolean(input.sketchDataUrl);
+  const hasValidInputForActiveMode =
+    input.mode === "text"
+      ? input.textDescription.trim().length >= 3
+      : input.mode === "photo"
+        ? Boolean(input.photoDataUrl)
+        : Boolean(input.sketchDataUrl);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!hasValidInput) {
-      onToast(
-        "Describe your object, upload a photo, or draw a quick sketch first.",
-        "info"
-      );
+    if (!hasValidInputForActiveMode) {
+      if (input.mode === "photo") {
+        onToast("Please upload a photo of your object first.", "info");
+      } else if (input.mode === "sketch") {
+        onToast("Please draw a quick sketch of your object first.", "info");
+      } else {
+        onToast("Please describe your object (at least 3 characters) first.", "info");
+      }
       return;
     }
     onSubmit();
@@ -338,14 +379,14 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
               htmlFor="craftly-photo-notes"
               className="block text-xs font-bold text-[#4A3528]"
             >
-              Add notes about size, damage, or material (recommended)
+              Add notes about size, damage, or material (optional)
             </label>
             <input
               id="craftly-photo-notes"
               type="text"
-              value={input.textDescription}
-              onChange={(e) => updateField("textDescription", e.target.value)}
-              placeholder="e.g., Cracked ceramic mug, thick base is still solid"
+              value={input.photoNotes ?? ""}
+              onChange={(e) => updateField("photoNotes", e.target.value)}
+              placeholder="e.g., Rubber flip-flop with snapped toe strap, sturdy grooved sole"
               className="mt-1.5 w-full rounded-xl border-[1.5px] border-[#D8CFC0] bg-[#F9F6F0] px-3.5 py-2.5 text-sm text-[#1C1B19] placeholder:text-[#4A3528]/45 focus:border-[#D98A6C] focus:bg-[#FFFDF9] focus:outline-none"
             />
           </div>
@@ -366,13 +407,13 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
               htmlFor="craftly-sketch-notes"
               className="block text-xs font-bold text-[#4A3528]"
             >
-              What did you sketch, and what is it made of?
+              What did you sketch, and what is it made of? (optional)
             </label>
             <input
               id="craftly-sketch-notes"
               type="text"
-              value={input.textDescription}
-              onChange={(e) => updateField("textDescription", e.target.value)}
+              value={input.sketchNotes ?? ""}
+              onChange={(e) => updateField("sketchNotes", e.target.value)}
               placeholder="e.g., Wooden crate with two broken slats"
               className="mt-1.5 w-full rounded-xl border-[1.5px] border-[#D8CFC0] bg-[#F9F6F0] px-3.5 py-2.5 text-sm text-[#1C1B19] placeholder:text-[#4A3528]/45 focus:border-[#D98A6C] focus:bg-[#FFFDF9] focus:outline-none"
             />

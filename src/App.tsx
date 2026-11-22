@@ -33,6 +33,8 @@ import {
 const INITIAL_INPUT: SynthesisInput = {
   mode: "text",
   textDescription: "",
+  photoNotes: "",
+  sketchNotes: "",
   goal: "",
   constraints: {
     availableMaterials: "",
