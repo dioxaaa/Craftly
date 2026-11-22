@@ -1,0 +1,8 @@
+{
+  "name": "Craftly",
+  "description": "See what else it could be. An imaginative invention studio that transforms ordinary, unused, or damaged objects into practical new creations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

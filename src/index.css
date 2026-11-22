@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fredoka", ui-rounded, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-canvas: #F9F6F0;
+  --color-ink: #4A3528;
+  --color-charcoal: #1C1B19;
+  --color-terracotta: #D98A6C;
+  --color-terracotta-hover: #C67658;
+  --color-sage: #7C8B6A;
+  --color-ochre: #E0A952;
+  --color-parchment: #F2EADF;
+  --color-border-warm: #D8CFC0;
+}
+
+@layer base {
+  html,
+  body {
+    background-color: #F9F6F0;
+    color: #4A3528;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+.font-display {
+  font-family: "Fredoka", ui-rounded, system-ui, sans-serif;
+}
+
+.font-mono-tech {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle paper & workshop scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F2EADF;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9BDAB;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B3A48E;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
